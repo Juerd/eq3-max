@@ -40,10 +40,7 @@ sub is_cube         { shift->{type} == 0 }
 sub set_room {
     my ($self, $new) = @_;
 
-    $self->{max}->{sock}->print("s:" .
-        encode_base64(pack "H*", sprintf "000022000000$self->{addr}00%02x", $new)
-        . "\r\n"
-    );
+    $self->{max}->_send("s:", sprintf "000022000000$self->{addr}00%02x", $new);
     $self->{max}->_command_success("S") or return;
     $self->{room} = $new;
 
@@ -55,12 +52,11 @@ sub set_room {
 
 sub add_link {
     my ($self, $other) = @_;
-    $self->{max}->{sock}->print("s:" . encode_base64(pack "H*", sprintf
-        "000020000000$self->{addr}%02x%s%s",
+    $self->{max}->_send("s:", sprintf "000020000000$self->{addr}%02x%s%s",
         $other->room->id,
         $other->addr,
         $other->type_num,
-    ) . "\r\n");
+    );
     return $self->{max}->_command_success("S");
 }
 

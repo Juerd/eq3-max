@@ -35,11 +35,10 @@ sub set_temperature {
     ($t2 == int $t2) or croak "Temperature not a multiple of 0.5";
     $t2 > 0 or $t2 < 256 or croak "Invalid temperature ($temperature)";
 
-    $self->{max}->{sock}->print("s:" . encode_base64(pack "H*", sprintf
-        "000440000000000000%02x%02x",
+    $self->{max}->_send("s:", sprintf "000440000000000000%02x%02x",
         $self->id,
         $t2 | 0x40,
-    ) . "\r\n");
+    );
 }
 
 1;

@@ -40,6 +40,7 @@ sub connect {
     my ($class, $host, $port) = @_;
     $port ||= 62910;
     my $self = bless {}, $class;
+
     $self->{sock} = IO::Socket::INET->new(
         PeerHost => $host, PeerPort => $port
     ) or die "Connect: $@";
@@ -49,8 +50,8 @@ sub connect {
 
 sub _waitfor {
     my ($self, $prefix) = @_;
-    my $sock = $self->{sock};
-    WAIT: while (my $line = readline $sock) {
+
+    while (my $line = $self->_readline) {
         if ($line =~ /^\Q$prefix\E:(.*)/) {
             return $1;
         } else {
@@ -100,14 +101,23 @@ sub _process_L {
     }
 }
 
+sub _send {
+    my ($self, $prefix, $hexdata) = @_;
+    $self->{sock}->print($prefix, encode_base64(pack "H*", $hexdata), "\r\n");
+}
+
+sub _readline {
+    my ($self) = @_;
+    return $self->{sock}->getline;
+}
+
 sub init {
     my ($self) = @_;
 
-    my $sock    = $self->{sock};
     my $devices = $self->{devices} ||= {};
     my $rooms   = $self->{rooms}   ||= {};
 
-    LINE: while (my $line = readline $sock) {
+    LINE: while (my $line = $self->_readline) {
         if ($line =~ /^C:([^,]+),(.*)/) {
             my ($addr, $data) = (lc $1, decode_base64 $2);
             my ($length, $addr2, $type, $room, $fw, $test, $serial)
@@ -144,7 +154,7 @@ sub init {
 
 sub pair {
     my ($self) = @_;
-    $self->{sock}->print("n:\r\n");
+    $self->_send("n:");
     my $response = decode_base64 $self->_waitfor("N")
         or croak "No response";
     my ($type, $addr, $serial, $unknown) = unpack "C a3 a10 C", $response;
@@ -161,14 +171,13 @@ sub pair {
 
 sub forget {
     my ($self, $addr) = @_;
-    my $base64 = encode_base64 pack "H*", $addr;
-    $self->{sock}->print("t:01,1,$base64\r\n");
+    $self->_send("t:01,1,", $addr);
     $self->_waitfor("A");
 }
 
 sub disconnect {
     my ($self) = @_;
-    $self->{sock}->print("q:\r\n");
+    $self->_send("q:");
     $self->{sock}->close;
 }
 
