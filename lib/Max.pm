@@ -99,9 +99,11 @@ sub init {
             );
 
             $devices->{$addr} = $device;
-            $rooms->{$room} ||= Max::Room->new(max => $self, id => $room);
-            $rooms->{$room}->add_device($device);
-            $device->_set(room => $rooms->{$room});
+            if ($room) {
+                $rooms->{$room} ||= Max::Room->new(max => $self, id => $room);
+                $rooms->{$room}->add_device($device);
+                $device->_set(room => $rooms->{$room});
+            }
         }
         if ($line =~ /^L:(.*)/) {
             $self->_process_L($1);
@@ -120,9 +122,19 @@ sub pair {
 
     $addr = lc unpack "H*", $addr;
     my $device = $self->{devices}{$addr} = Max::Device->new(
-        type => $type, addr => $addr, serial => $serial
+        max => $self,
+        type => $type,
+        addr => $addr,
+        serial => $serial,
     );
     return $device;
+}
+
+sub forget {
+    my ($self, $addr) = @_;
+    my $base64 = encode_base64 pack "H*", $addr;
+    $self->{sock}->print("t:01,1,$base64\r\n");
+    $self->_waitfor("A");
 }
 
 sub disconnect {
@@ -145,8 +157,7 @@ sub room {
     my ($self, $room) = @_;
     $room = $room->id if ref $room;
     $room += 0;
-    return if not exists $self->{rooms}{$room};
-    return $self->{rooms}->{$room};
+    return $self->{rooms}{$room} ||= Max::Room->new(max => $self, id => $room);
 }
 
 1;

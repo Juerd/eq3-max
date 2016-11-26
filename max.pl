@@ -34,8 +34,15 @@ if ($command eq 'pair') {
     my $max = Max->connect($host)->init;
     print "Press and hold OK/Boost on the new device...\n";
     my $device = $max->pair();
+    print "Pairing done; setting room ID...\n";
     my $success = $device->set_room($room);
     print $success ? "Pairing succesful.\n" : "Pairing failed.\n";
+} elsif ($command eq 'forget') {
+    my $usage = "Usage: $0 forget <addr>\n";
+    my ($addr) = (lc shift // "") =~ /^([0-9A-Fa-f]{6})$/ or die $usage;
+
+    my $max = Max->connect($host)->init;
+    $max->forget($addr);
 } elsif ($command eq 'crosslink') {
     my $usage = "Usage: $0 crosslink <roomid>\n";
     my $room_id = shift;

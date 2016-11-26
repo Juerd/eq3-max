@@ -45,6 +45,7 @@ sub set_room {
         . "\r\n"
     );
     $self->{max}->_command_success("S") or return;
+    $self->{room} = $new;
 
     my $room = $self->{max}->room($self->{room});
     $room->add_device($self);
