@@ -3,8 +3,6 @@ use strict;
 use lib 'lib';
 use Max;
 
-my $host = "192.168.1.103";
-
 sub _valid_uint8 {
     my ($id) = @_;
     defined $id     or return 0;
@@ -22,6 +20,13 @@ sub _valid_temperature {
     $t >= 0 or return 0;  # limit?
     $t < 60 or return 0;  # limit?
     return 1;
+}
+
+my $host = $ENV{MAX_HOST};
+
+if (not $host) {
+    $host = Max->discover or die "MAX_HOST is not set, UDP discovery failed.\n";
+    print "Found cube at $host\n";
 }
 
 my $command = shift || '';

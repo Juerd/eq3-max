@@ -3,10 +3,7 @@
 Because other implementations were part of larger systems, didn't compile, or
 were incomplete to the point of being useless, eventually I decided to roll my
 own. And of course, my version is incomplete too. But at least it's not part
-of a larger system; just run the application with a perl 5.20 or newer
-and it should Just Work.
-
-(If you have an older perl, install IO::Socket::IP from CPAN.)
+of a larger system; just run the application and it should Just Work.
 
 I've never used the official Windows or Mac software on my Cube, and as such
 had to find out how to use the protocol from scratch. No portal, no cloud!
@@ -29,11 +26,19 @@ Please add detailed info about why the change was needed.
 
 Assuming out-of-the box Cube:
 
-1. Find out its IP address from your DHCP server, or scan the network for
-port 62910. Get a debug dump to see if anything works at all. You should
+1. Get a debug dump to see if anything works at all. You should
 see your Cube's serial number and RF address:
 
 ```
+    ./max.pl dump
+```
+
+  If it cannot find your Max! Cube via UDP, you can set the `MAX_HOST`
+  environment variable. If discovery does work, you may want to set the
+  variable anyway, because that will make every call half a second faster.
+
+```
+    export MAX_HOST=192.168.1.9
     ./max.pl dump
 ```
 

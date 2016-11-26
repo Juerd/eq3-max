@@ -1,17 +1,46 @@
 use strict;
 
 package Max;
-use IO::Socket::IP;
+use IO::Socket::INET;
+use IO::Select;
 use Carp qw(croak carp);
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Max::Room;
 use Max::Device;
 
+sub discover {
+    my ($class) = @_;
+    ref $class and croak "Class method called on instance";
+
+    my $send = IO::Socket::INET->new(
+        PeerAddr => "255.255.255.255",
+        PeerPort => 23272,
+        Proto => 'udp',
+        Broadcast => 1,
+        Reuse => 1,
+    ) or die "Can't open broadcast socket ($!)";
+    $send->send("eQ3Max*\0**********I") or die $!;
+
+    my $receive = IO::Socket::INET->new(
+        LocalAddr => "0.0.0.0",
+        LocalPort => 23272,
+        Proto => 'udp',
+        Reuse => 1,
+    );
+    my $select = IO::Select->new;
+    $select->add($receive);
+    my $buf;
+    if ($select->can_read(2) && $receive->recv($buf, 1)) {
+        return $receive->peerhost;
+    }
+    return;
+}
+
 sub connect {
     my ($class, $host, $port) = @_;
     $port ||= 62910;
     my $self = bless {}, $class;
-    $self->{sock} = IO::Socket::IP->new(
+    $self->{sock} = IO::Socket::INET->new(
         PeerHost => $host, PeerPort => $port
     ) or die "Connect: $@";
 
