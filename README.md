@@ -3,8 +3,10 @@
 Because other implementations were part of larger systems, didn't compile, or
 were incomplete to the point of being useless, eventually I decided to roll my
 own. And of course, my version is incomplete too. But at least it's not part
-of a larger system; just run the application with a recent Perl version and it
-should Just Work.
+of a larger system; just run the application with a perl 5.20 or newer
+and it should Just Work.
+
+(If you have an older perl, install IO::Socket::IP from CPAN.)
 
 I've never used the official Windows or Mac software on my Cube, and as such
 had to find out how to use the protocol from scratch. No portal, no cloud!
