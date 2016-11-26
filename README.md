@@ -29,7 +29,7 @@ Assuming out-of-the box Cube:
 1. Get a debug dump to see if anything works at all. You should
 see your Cube's serial number and RF address:
 
-```
+  ```
     ./max.pl dump
 ```
 
@@ -37,7 +37,7 @@ see your Cube's serial number and RF address:
   environment variable. If discovery does work, you may want to set the
   variable anyway, because that will make every call half a second faster.
 
-```
+  ```
     export MAX_HOST=192.168.1.9
     ./max.pl dump
 ```
@@ -46,33 +46,33 @@ see your Cube's serial number and RF address:
 is the room ID. It might be useful to pick different room numbers than
 your neighbours :)
 
-```
+  ```
     ./max.pl pair 2  # follow instructions to add to room 2
     ./max.pl pair 2  # repeat until done
 ```
 
 3. See if the devices show up in the overview:
 
-```
+  ```
     ./max.pl
 ```
 
 4. If you added multiple devices, set up links between the devices in the
 room:
 
-```
+  ```
     ./max.pl crosslink 2
 ```
 
 5. Set the temperature of the room:
 
-```
+  ```
     ./max.pl set 2  21.5
 ```
 
 6. See if the devices report the new setpoint:
 
-```
+  ```
     ./max.pl
     # It may take a while before devices synchronise
 ```
@@ -81,7 +81,7 @@ room:
 
 8. Use 'watch' to get a live refreshing overview:
 
-```
+  ```
     watch ./max.pl
 ```
 
