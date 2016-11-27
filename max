@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
-use lib 'lib';
+use FindBin qw($RealBin);
+use lib "$RealBin/lib";
 use Max;
 
 sub _valid_uint8 {

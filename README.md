@@ -22,6 +22,16 @@ assumption is correct.
 Patches welcome, though! :-)
 Please add detailed info about why the change was needed.
 
+# Installing
+
+This repository comes without an installer and installation is not necessary.
+But you could do something like:
+
+```
+    git clone https://github.com/Juerd/eq3-max /opt/eq3-max
+    ln -s /opt/eq3-max/max /usr/local/bin
+```
+
 # How to use
 
 Assuming out-of-the box Cube:
@@ -30,7 +40,7 @@ Assuming out-of-the box Cube:
 see your Cube's serial number and RF address:
 
   ```
-    ./max.pl dump
+    max dump
 ```
 
   If it cannot find your Max! Cube via UDP, you can set the `MAX_HOST`
@@ -39,7 +49,7 @@ see your Cube's serial number and RF address:
 
   ```
     export MAX_HOST=192.168.1.9
-    ./max.pl dump
+    max dump
 ```
 
 2. Pair all the devices in a room. Pick a room number; in this example "2"
@@ -47,33 +57,33 @@ is the room ID. It might be useful to pick different room numbers than
 your neighbours :)
 
   ```
-    ./max.pl pair 2  # follow instructions to add to room 2
-    ./max.pl pair 2  # repeat until done
+    max pair 2  # follow instructions to add to room 2
+    max pair 2  # repeat until done
 ```
 
 3. See if the devices show up in the overview:
 
   ```
-    ./max.pl
+    max
 ```
 
 4. If you added multiple devices, set up links between the devices in the
 room:
 
   ```
-    ./max.pl crosslink 2
+    max crosslink 2
 ```
 
 5. Set the temperature of the room:
 
   ```
-    ./max.pl set 2  21.5
+    max set 2  21.5
 ```
 
 6. See if the devices report the new setpoint:
 
   ```
-    ./max.pl
+    max
     # It may take a while before devices synchronise
 ```
 
@@ -82,7 +92,7 @@ room:
 8. Use 'watch' to get a live refreshing overview:
 
   ```
-    watch ./max.pl
+    watch max
 ```
 
 
