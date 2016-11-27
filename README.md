@@ -2,12 +2,12 @@
 
 Because other implementations were part of larger systems, didn't compile, or
 were incomplete to the point of being useless, eventually I decided to roll my
-own. And of course, my version is incomplete too. But at least it's not part
-of a larger system; just run the application and it should Just Work.
+own. And of course, my version is incomplete too. But it's a stand-alone script
+that does not depend on an entire home automation platform.
 
 I've never used the official Windows or Mac software on my Cube, and as such
-had to find out how to use the protocol from scratch. No portal, no cloud!
-Just control the entire device from a single command line utility.
+had to find out how to use the protocol on a new, unconfigured Cube. No portal,
+no cloud! Just control the entire device from a single command line utility.
 
 # Disclaimer
 
@@ -17,7 +17,8 @@ SPECIFIC SITUATION. DON'T COMPLAIN IF IT BURNS DOWN YOUR HOUSE...
 I had to make a lot of assumptions. For example, I'll assume that all the
 devices in a room should be linked together. But I only have at most 1 wall
 thermostat and 1 TRV per room, so with multiple TRVs I don't know if my
-assumption is correct.
+assumption is correct. And I have no idea how the Eco button works, or whether
+the program will work with other "eQ-3 Max!" devices that I don't own.
 
 Patches welcome, though! :-)
 Please add detailed info about why the change was needed.
@@ -95,4 +96,7 @@ room:
     watch max
 ```
 
+# Does it work?
+
+Please let me know. :-)
 
