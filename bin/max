@@ -2,7 +2,7 @@
 use strict;
 use List::Util qw(sum max);
 use FindBin qw($RealBin);
-use lib "$RealBin/lib";
+use lib "$RealBin/../lib";
 use Max;
 
 my $host = $ENV{MAX_HOST};

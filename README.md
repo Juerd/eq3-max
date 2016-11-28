@@ -30,7 +30,7 @@ But you could do something like:
 
 ```
     git clone https://github.com/Juerd/eq3-max /opt/eq3-max
-    ln -s /opt/eq3-max/max /usr/local/bin
+    ln -s /opt/eq3-max/bin/* /usr/local/bin
 ```
 
 # How to use
