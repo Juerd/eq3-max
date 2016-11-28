@@ -170,8 +170,8 @@ sub pair {
 }
 
 sub forget {
-    my ($self, $addr) = @_;
-    $self->_send("t:01,1,", $addr);
+    my ($self, $dev) = @_;
+    $self->_send("t:01,1,", ref($dev) ? $dev->addr : $dev);
     $self->_waitfor("A");
 }
 
