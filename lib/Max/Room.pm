@@ -23,6 +23,40 @@ sub devices {
     return @{ $self->{devices} }{ sort keys %{$self->{devices}} };
 }
 
+sub temperature {
+    my ($self) = @_;
+
+    for my $device ($self->devices) {
+        return $device->temperature if $device->has_temperature;
+    }
+    return undef;
+}
+
+sub setpoint {
+    my ($self) = @_;
+
+    for my $device ($self->devices) {
+        # Favour wall thermostat over other devices
+        return $device->setpoint if $device->has_temperature;
+    }
+
+    for my $device ($self->devices) {
+        # TRVs sometimes report setpoint as 0.0
+        return $device->setpoint if $device->setpoint > 0;
+    }
+    return undef;
+}
+
+sub too_cold {
+    my ($self, $maxdelta) = @_;
+    $maxdelta ||= 0;
+
+    my $temperature = $self->temperature or return undef;
+    my $setpoint = $self->setpoint or return undef;
+
+    return $setpoint - $temperature > $maxdelta;
+}
+
 sub add_device {
     my ($self, $device) = @_;
     $device->isa("Max::Device") or croak "Not a Max::Device";

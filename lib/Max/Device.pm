@@ -34,7 +34,7 @@ sub flags_as_string {
 }
 
 sub has_temperature { shift->{type} == 3 }
-sub has_valve       { shift->{type} == 1 or shift->{type} == 2 }
+sub has_valve       { $_[0]->{type} == 1 or $_[0]->{type} == 2 }
 sub is_cube         { shift->{type} == 0 }
 
 sub set_room {

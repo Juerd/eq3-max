@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
+use List::Util qw(sum max);
 use FindBin qw($RealBin);
 use lib "$RealBin/lib";
 use Max;
@@ -124,6 +125,24 @@ sub do_summary {
             );
         }
     }
+}
+
+sub do_switch {
+    my ($command, $on, $off) = @_;
+    $command or die "Usage: $0 switch <command> [<onparam> <offparam>]\n";
+    $command .= " %s" if $command !~ /%s/;
+    $on  //= 1;
+    $off //= 0;
+
+    my $max = Max->connect($host)->init;
+
+    my $switch = grep $_->too_cold, $max->rooms;
+    my @valves = map $_->valve, grep $_->has_valve, $max->devices;
+    $switch = 0 unless sum(@valves) > 60 or max(@valves) > 50;
+
+    $command = sprintf $command, $switch ? $on : $off;
+    print "Executing: $command\n";
+    system $command;
 }
 
 my $command = shift || 'summary';
