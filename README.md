@@ -129,6 +129,8 @@ This will run either `enable-my-boiler` or `disable-my-boiler`.
   take a minute after setting a new temperature setpoint, before the heater will
   come on.
 
+For a dry-run test, use `max switch echo`.
+
 # Does it work?
 
 Please let me know. :-)
