@@ -1,0 +1,34 @@
+#!/bin/sh
+gpio=20
+
+echo $gpio > /sys/class/gpio/export 2>/dev/null
+echo out   > /sys/class/gpio/gpio$gpio/direction
+echo "$1"  > /sys/class/gpio/gpio$gpio/value
+
+# "gpio-set 1" sets the GPIO to HIGH, "gpio-set 0" sets it to LOW.
+# This could be used with an external relay to control a boiler for
+# central heating.
+#
+#    +---boiler---+         boiler switch contacts
+#    |            |
+#    |     /      |         }
+#    |    /:      |         }
+#    +---o : o----+         } relay
+#          :                }
+#    +----uuuu----+         }
+#    |            |
+#    +----->|-----+         flyback diode (reverse-biased!)
+#    |            |
+#    |          +12V        or whatever voltage the relay needs
+#    |  D
+#    +---|                  }
+#        |--------+         } logic-level MOSFET (N-channel), e.g. IRF540
+#    +---|  G     |         }
+#    |  S         |
+#    |            |
+#    +---/\/\/----+         pull-down resistor, e.g. 1k 1/4W
+#    |            |
+#   _|_           |
+#    -            |
+#   GND         GPIO        host board (e.g. raspberry pi) GPIO pin
+

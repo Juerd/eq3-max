@@ -96,6 +96,39 @@ room:
     watch max
 ```
 
+# Controlling a boiler for central heating
+
+You may skip this part if you don't have a boiler that needs to be switched.
+
+The Max! system by itself is not suited for use with a boiler that requires
+a single thermostat to indicate the demand for heating. The `max switch`
+command can emulate a simple thermostat and will execute a given command:
+
+```
+    max switch '/opt/eq3-max/contrib/set-gpio'
+```
+
+This example will call the ```set-gpio``` script with a single parameter
+(`0` or `1`) to control a relay.
+
+Additional parameters can be specified if you need other values than `0` and
+`1`, and the command may include `%s` to indicate an alternative location
+for the variable:
+
+```
+    max switch '/usr/local/bin/%s-my-boiler' enable disable
+```
+
+This will run either `enable-my-boiler` or `disable-my-boiler`.
+
+- `max switch` needs to be called frequently, for example once every 10 seconds.
+- The program is stateless and will unconditionally execute the given command,
+  even if no change has occurred.
+- It will only request heat if any room with a wall thermostat is too cold AND
+  at least one TRV has a valve that is sufficiently opened. As such, it may
+  take a minute after setting a new temperature setpoint, before the heater will
+  come on.
+
 # Does it work?
 
 Please let me know. :-)
