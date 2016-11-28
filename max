@@ -4,6 +4,8 @@ use FindBin qw($RealBin);
 use lib "$RealBin/lib";
 use Max;
 
+my $host = $ENV{MAX_HOST};
+
 sub _valid_uint8 {
     my ($id) = @_;
     defined $id     or return 0;
@@ -13,6 +15,7 @@ sub _valid_uint8 {
     $id <= 255      or return 0;
     return 1;
 }
+
 sub _valid_temperature {
     my ($t) = @_;
     defined $t      or return 0;
@@ -22,8 +25,6 @@ sub _valid_temperature {
     $t < 60 or return 0;  # limit?
     return 1;
 }
-
-my $host = $ENV{MAX_HOST};
 
 sub do_pair {
     my ($room) = @_;
@@ -75,7 +76,7 @@ sub do_crosslink {
 }
 
 sub do_dump {
-    use Data::Dumper ();
+    require Data::Dumper;
     my $max = Max->connect($host)->init;
     print Data::Dumper::Dumper($max);
 }
