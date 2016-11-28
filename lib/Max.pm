@@ -193,7 +193,6 @@ sub rooms {
 
 sub room {
     my ($self, $room) = @_;
-    $room = $room->id if ref $room;
     $room += 0;
     return $self->{rooms}{$room} ||= Max::Room->new(max => $self, id => $room);
 }
