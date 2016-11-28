@@ -1,0 +1,72 @@
+=head1 NAME
+
+max - Simple shell interface for the eQ-3 MAX! Cube LAN Gateway
+
+=head1 SYNOPSIS
+
+    max summary
+
+    max pair 42
+    max crosslink 42
+    max set 42 18.0
+    max dump
+
+    max switch '/usr/local/bin/set-gpio'
+    max switch '/usr/local/bin/%s-my-boiler' enable disable
+
+=head1 DESCRIPTION
+
+For instructions and examples, please refer to the main documentation
+in the C<README.md> file of this distribution.
+
+=head2 Subcommands
+
+When no subcommand is given, C<summary> is used.
+
+=head3 crosslink <room_id>
+
+For each of the devices in a room, commands the device to link with each of the
+other devices in that room.
+
+=head3 dump
+
+Outputs a debug dump of the internal state after conncting
+
+=head3 pair <room_id>
+
+Initiates the pairing of a new device and configures the device's room id.
+
+=head3 set <room_id> <temperature>
+
+Sends a new temperature to the devices in a room, forcing the mode to I<manual>.
+
+=head3 summary
+
+Outputs a summary of device attributes, grouped by room.
+
+=head3 switch <command> [<on> <off>]
+
+Determines whether there is a demand for heat, and runs the given shell command
+accordingly. C<command> is a sprintf-like format and should only contain a
+single C<%s> placeholder. Any other C<%> character should be escaped as C<%%>.
+If no C<%s> is given, it is added at the end so that it becomes a command line
+argument.
+
+C<on> defaults to C<1>, C<off> defaults to C<0>.
+
+=head2 Environment variables
+
+=head3 MAX_HOST
+
+Can be set to the hostname or IPv4 address of the Cube to disable automatic
+discovery.
+
+=head1 LICENSE
+
+Pick your favourite OSI approved license :)
+
+http://www.opensource.org/licenses/alphabetical
+
+=head1 AUTHOR
+
+Juerd Waalboer <#####@juerd.nl> <http://juerd.nl/>
