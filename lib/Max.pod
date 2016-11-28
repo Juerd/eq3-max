@@ -1,0 +1,104 @@
+=head1 NAME
+
+Max - Perl interface for "eQ-3 MAX! Cube LAN Gateway"
+
+=head1 SYNOPSIS
+
+    use Max;
+
+    my $host = Max->discover or die;
+    my $max = Max->connect($host)->init;
+
+    my $max = Max->connect("192.168.1.9")->init;
+
+    for my $device ($max->devices) { ... }
+    for my $room ($max->rooms) { ... }
+
+    my $device = $max->pair;
+    $device->set_room(42);
+
+    $max->room(42)->set_temperature(21.5);
+
+=head1 DESCRIPTION
+
+This library is a very simple and incomplete interface for the Max! system.
+It implements a minimal set of features and does not depend on other Perl
+modules.
+
+The distribution comes with a binary, C<max>, which implements a simple
+shell interface.
+
+=head2 Class methods
+
+=head3 Max->connect($host[, $port])
+
+Connects to the Cube and returns a new Max object.
+
+=head3 Max->discover
+
+Attempts to discover the Cube's IP address on the network. Naively believes
+that the first device to respond is a Max! Cube with no further checks.
+
+=head2 Instance methods
+
+=head3 init
+
+Handles the incoming data immediately after connecting. As such, it must
+be called immediately after connecting.
+
+=head3 pair
+
+Initiates device pairing on the Cube. If successful, returns a Max::Device
+object that represents the newly paired device. Dies on recognised errors.
+
+=head3 forget($dev)
+
+Given a Max::Device or a 6-digit hexadecimal address, removes the indicated
+device from the Cube. Does not (yet) remove the device from the internal cache,
+so even after forget(), it will still be listed.
+
+=head3 disconnect
+
+Disconnects gracefully. No methods involving communication with the Cube should
+be called after disconnecting.
+
+=head3 room($id)
+
+Returns the Max::Room object for the given room ID. Creates a new object (but
+doesn't register a new room with the Cub) if the given ID is new.
+
+=head3 rooms
+
+Returns a list of discovered rooms as Max::Room objects, ordered by ID.
+
+=head3 devices
+
+Returns a list of discovered devices as Max::Device objects. The order is not
+guaranteed.
+
+=head1 SECURITY CONSIDERATIONS
+
+The Max! Cube is completely insecure. It's probably wise to run it on a
+separate network without any internet connection.
+
+=head1 CAVEATS
+
+=over
+
+=item * The Max! Cube cannot handle concurrent connections and this library
+does not try to work around that issue.
+
+=item * Connection errors are not handled properly.
+
+=back
+
+=head1 LICENSE
+
+Pick your favourite OSI approved license :)
+
+http://www.opensource.org/licenses/alphabetical
+
+=head1 AUTHOR
+
+Juerd Waalboer <#####@juerd.nl> <http://juerd.nl/>
+

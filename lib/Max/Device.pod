@@ -1,0 +1,139 @@
+=head1 NAME
+
+Max::Device - Class to represent an eQ-3 Max! device
+
+=head1 SYNOPSIS
+
+    use Max;
+
+    for my $device ($max->devices) { ... }
+    for my $device ($room->devices) { ... }
+
+    $device->room->set_temperature(21.5);
+
+    my $room = $device->set_room(42);
+    $device->add_link($other_device);
+
+    if ($device->has_temperature) {
+        say "Current temperature is " . $device->temperature;
+    }
+
+    if ($device->is_cube) { ... }
+
+    if ($device->has_valve) {
+        printf "Valve is %d%% open.", $device->valve;
+    }
+
+    if ($device->flags_as_string =~ /battery/) {
+        say "Low battery.";
+    }
+
+
+=head1 DESCRIPTION
+
+Represents a device in an "eQ-3 Max!" network.
+
+=head2 Class methods
+
+=head3 Max::Device->new(...)
+
+Considered an internal method; should not be called directly.
+
+=head2 Instance methods
+
+=head3 addr
+
+Returns the 6 digit hexadecimal address.
+
+=head3 room
+
+Returns the Max::Room object for the associated room.
+
+=head3 setpoint
+
+Returns the currently target temperature.
+
+=head3 temperature
+
+Returns the measured temperature. Note: not all devices support this feature.
+Most notably, the TRVs don't. Use C<has_temperature> to test this.
+
+=head3 valve
+
+Returns the current position of the valve. 0 is fully closed, 100 is fully open.
+Note: not all devices have a valve. Use C<has_valve> to test this.
+
+=head3 type_num, type
+
+Returns the type either as a number, or as a string.
+Possible types are:
+
+    0 cube
+    1 heater
+    2 heater+
+    3 thermostat
+    4 shutter
+    5 button
+
+=head3 mode_num, mode
+
+Returns the current mode as a number, or as a string.
+Possible modes are:
+
+    0 auto
+    1 manual
+    2 vacation
+    3 boost
+
+=head3 flags_as_string
+
+Returns a space-joined list of flag in alphabetical order. Possible flags are:
+
+    init
+    link
+    battery
+    error
+    invalid
+
+=head3 has_temperature, has_valve, is_cube
+
+Returns a boolean value according to the device type.
+
+=head3 set_room($room_id)
+
+Configures the device to associate with a certain room ID. The room has to be
+given as a numeric ID.
+
+Returns undef on failure. Returns a Max::Room object on success, and updates
+the Max::Room object in the parent Max object.
+
+=head3 add_link($device)
+
+Given another Max::Device object, sets up a unidirectional link between the
+devices. In a typical situation, devices will be cross-linked, but this method
+does not automate that.
+
+Returns true on success, false on failure.
+
+=head1 CAVEATS
+
+=over
+
+=item * Shutter and button devices are not (yet) supported.
+
+=item * Tricks exist to read the current measured temperature from a TRV, but
+because that involves waiting for parameters to change, this library does not
+implement such tricks. Consider buying a wall thermostat for every room.
+
+=back
+
+=head1 LICENSE
+
+Pick your favourite OSI approved license :)
+
+http://www.opensource.org/licenses/alphabetical
+
+=head1 AUTHOR
+
+Juerd Waalboer <#####@juerd.nl> <http://juerd.nl/>
+

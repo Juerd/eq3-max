@@ -1,0 +1,84 @@
+=head1 NAME
+
+Max::Room - Class to represent a group of eQ-3 Max! devices
+
+=head1 SYNOPSIS
+
+    use Max;
+
+    for my $room ($max->rooms) { ... }
+
+    my $room = $max->room(42);
+    $room->set_temperature(21.5);
+
+=head1 DESCRIPTION
+
+Represents a "room" or "group" of thermostatic devices in the "eQ-3 MAX!"
+system.
+
+=head2 Class methods
+
+=head3 Max::Room->new(...)
+
+Considered an internal method; should not be called directly.
+
+=head2 Instance methods
+
+=head3 set_temperature($temperature)
+
+Sends a new B<manual> setpoint temperature to all the devices in the room. The
+new temperature must be a multiple of 0.5.
+
+Currently does not handle errors.
+
+=head3 devices
+
+Returns a list of discovered devices as Max::Device objects. The order is not
+guaranteed.
+
+=head3 temperature
+
+Returns the actual temperature as reported by a wall thermostat in the room.
+Returns undef if the temperature is not known.
+
+=head3 setpoint
+
+Returns the configured target temperature as reported by a device in the room.
+If a wall thermostat is present, its temperature is preferred. Without any wall
+thermostat, will use any other device's reported setpoint.
+
+Returns undef if the setting is not known.
+
+=head3 too_cold([$maxdelta])
+
+Returns true if the measured temperature is more than C<$maxdelta> degrees
+colder than the setpoint. The parameter defaults to 0. Returns undef if the
+temperature or setpoint is not known.
+
+=head3 add_device($device)
+
+Given a Max::Device object, adds it to the room object. Does not update the
+Cube's configuration; use C<< $device->set_room >> for that.
+
+=head1 CAVEATS
+
+=over
+
+=item * Very little parameter checking is done.
+
+=item * Because C<set_temperature> sets the mode to "manual", the setting is
+kept. The suggested use of this library is to set programs on a computer (via
+cron) rather than directly on the devices.
+
+=back
+
+=head1 LICENSE
+
+Pick your favourite OSI approved license :)
+
+http://www.opensource.org/licenses/alphabetical
+
+=head1 AUTHOR
+
+Juerd Waalboer <#####@juerd.nl> <http://juerd.nl/>
+
