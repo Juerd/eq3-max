@@ -25,16 +25,10 @@ sub _valid_temperature {
 
 my $host = $ENV{MAX_HOST};
 
-if (not $host) {
-    $host = Max->discover or die "MAX_HOST is not set, UDP discovery failed.\n";
-    print "Found cube at $host\n";
-}
+sub do_pair {
+    my ($room) = @_;
 
-my $command = shift || '';
-
-if ($command eq 'pair') {
     my $usage = "Usage: $0 pair <roomid>\n";
-    my $room = shift;
     _valid_uint8($room) && $room > 0 or die $usage;
 
     my $max = Max->connect($host)->init;
@@ -43,15 +37,22 @@ if ($command eq 'pair') {
     print "Pairing done; setting room ID...\n";
     my $success = $device->set_room($room);
     print $success ? "Pairing succesful.\n" : "Pairing failed.\n";
-} elsif ($command eq 'forget') {
+}
+
+sub do_forget {
+    my ($addr) = @_;
+
     my $usage = "Usage: $0 forget <addr>\n";
-    my ($addr) = (lc shift // "") =~ /^([0-9A-Fa-f]{6})$/ or die $usage;
+    ($addr) = (lc $addr // "") =~ /^([0-9A-Fa-f]{6})$/ or die $usage;
 
     my $max = Max->connect($host)->init;
     $max->forget($addr);
-} elsif ($command eq 'crosslink') {
+}
+
+sub do_crosslink {
+    my ($room_id) = @_;
+
     my $usage = "Usage: $0 crosslink <roomid>\n";
-    my $room_id = shift;
     _valid_uint8($room_id) && $room_id > 0 or die $usage;
 
     my $max = Max->connect($host)->init;
@@ -71,21 +72,27 @@ if ($command eq 'pair') {
             print $success ? " OK.\n" : " FAILED.\n";
         }
     }
-} elsif ($command eq 'dump') {
+}
+
+sub do_dump {
     use Data::Dumper ();
     my $max = Max->connect($host)->init;
     print Data::Dumper::Dumper($max);
-} elsif ($command eq 'set') {
+}
+
+sub do_set {
+    my ($room_id, $setpoint) = @_;
+
     my $usage = "Usage: $0 manual <roomid> <temperature per 0.5>\n";
-    my $room_id = shift;
-    my $setpoint = shift;
     _valid_uint8($room_id) && $room_id > 0 or die $usage;
     _valid_temperature($setpoint) or die $usage;
 
     my $max = Max->connect($host)->init;
     my $room = $max->room($room_id) or die "There is no room $room_id";
     $room->set_temperature($setpoint) or die "Setting temperature failed";
-} else {
+}
+
+sub do_summary {
     my $max = Max->connect($host)->init;
     for my $room ($max->rooms) {
         my @devices = $room->devices;
@@ -112,5 +119,15 @@ if ($command eq 'pair') {
         }
     }
 }
+
+my $command = shift || 'summary';
+my $sub = $::{"do_$command"} or die "Unknown subcommand '$command'.\n";
+
+if (not $host) {
+    $host = Max->discover or die "MAX_HOST is not set, UDP discovery failed.\n";
+    print "Found cube at $host\n";
+}
+
+$sub->(@ARGV);
 
 print "-Done-\n";
