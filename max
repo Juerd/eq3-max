@@ -77,8 +77,13 @@ sub do_crosslink {
 
 sub do_dump {
     require Data::Dumper;
+    no warnings 'once';
+    $Data::Dumper::Terse    = 1;
+    $Data::Dumper::Indent   = 1;
+    $Data::Dumper::Purity   = 0;
+    $Data::Dumper::Maxdepth = 2;
     my $max = Max->connect($host)->init;
-    print Data::Dumper::Dumper($max);
+    print Data::Dumper::Dumper($max->devices);
 }
 
 sub do_set {
