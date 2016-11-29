@@ -103,6 +103,7 @@ sub _process_L {
 
 sub _send {
     my ($self, $prefix, $hexdata) = @_;
+    $hexdata ||= "";
     $self->{sock}->print($prefix, encode_base64(pack "H*", $hexdata), "\r\n");
 }
 
