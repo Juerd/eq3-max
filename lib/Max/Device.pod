@@ -99,10 +99,10 @@ Returns a space-joined list of flag in alphabetical order. Possible flags are:
 
 Returns a boolean value according to the device type.
 
-=head3 set_room($room_id)
+=head3 set_room($room)
 
-Configures the device to associate with a certain room ID. The room has to be
-given as a numeric ID.
+Given a Max::Room object or a numeric room ID, configures the device to
+associate with that room.
 
 Returns undef on failure. Returns a Max::Room object on success, and updates
 the Max::Room object in the parent Max object.

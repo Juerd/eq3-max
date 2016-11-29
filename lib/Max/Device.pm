@@ -40,11 +40,11 @@ sub is_cube         { shift->{type} == 0 }
 sub set_room {
     my ($self, $new) = @_;
 
-    $self->{max}->_send("s:", sprintf "000022000000$self->{addr}00%02x", $new);
+    my $id = ref($new) ? $new->id : $new;
+    $self->{max}->_send("s:", sprintf "000022000000$self->{addr}00%02x", $id);
     $self->{max}->_command_success("S") or return;
-    $self->{room} = $new;
 
-    my $room = $self->{max}->room($self->{room});
+    my $room = $self->{max}->room($id);
     $room->add_device($self);
 
     return $self->{room} = $room;
