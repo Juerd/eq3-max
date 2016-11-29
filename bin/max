@@ -49,6 +49,7 @@ sub do_forget {
 
     my $max = Max->connect($host)->init;
     $max->forget($addr);
+    print "Done.\n";
 }
 
 sub do_crosslink {
@@ -101,6 +102,7 @@ sub do_set {
         $room->devices or warn "No devices in room " . $room->id . "\n";
         $room->setpoint($setpoint) or die "Setting temperature failed";
     }
+    print "Done.\n";
 }
 
 sub do_summary {
@@ -109,7 +111,9 @@ sub do_summary {
         my @devices = $room->devices;
         next if @devices == 1 and $devices[0]->is_cube;
 
-        printf "[Room %d: %s]\n", $room->id, $room->name // "unnamed";
+        printf "* %s(%d)\n", $room->name, $room->id if defined $room->name;
+        printf "* room %d\n", $room->id if not defined $room->name;
+
         for my $device (@devices) {
             my $extra = 
                 $device->has_temperature
@@ -169,4 +173,3 @@ if (not $host) {
 
 $sub->(@ARGV);
 
-print "-Done-\n";
