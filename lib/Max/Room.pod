@@ -36,6 +36,8 @@ Currently does not handle errors.
 Returns a list of discovered devices as Max::Device objects. The order is not
 guaranteed.
 
+In scalar context, returns the number of devices.
+
 =head3 temperature
 
 Returns the actual temperature as reported by a wall thermostat in the room.

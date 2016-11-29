@@ -71,10 +71,14 @@ doesn't register a new room with the Cub) if the given ID is new.
 
 Returns a list of discovered rooms as Max::Room objects, ordered by ID.
 
+In scalar context, returns the number of rooms.
+
 =head3 devices
 
 Returns a list of discovered devices as Max::Device objects. The order is not
 guaranteed.
+
+In scalar context, returns the number of devices.
 
 =head1 SECURITY CONSIDERATIONS
 
