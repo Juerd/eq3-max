@@ -69,6 +69,36 @@ sub _command_success {
     return !$error;
 }
 
+sub _process_C {
+    my ($self, $data) = @_;
+    my ($addr_hex, $base64) = $data =~ /([^,]+),(.*)/;
+
+    my ($length, $addr2, $type, $room, $fw, $test, $serial)
+        = unpack("C a3 C C C C a10", decode_base64 $base64);
+
+    my $addr2_hex = unpack "H*", $addr2;
+    warn "Address mismatch in 'C' response ($addr_hex != $addr2_hex)\n"
+        if $addr2_hex ne $addr_hex;
+
+    my $device = Max::Device->new(
+        max         => $self,
+        addr        => $addr2,
+        type        => $type,
+        firmware    => sprintf("%.1f", $fw/10),  # guessed
+        test_result => $test,
+        serial      => $serial,
+    );
+
+    $self->{devices}{$addr2} = $device;
+    if ($room) {
+        my $rooms = $self->{rooms};
+
+        $rooms->{$room} ||= Max::Room->new(max => $self, id => $room);
+        $rooms->{$room}->add_device($device);
+        $device->_set(room => $rooms->{$room});
+    }
+}
+
 sub _process_L {
     my ($self, $base64) = @_;
     my $data = decode_base64 $base64;
@@ -99,6 +129,48 @@ sub _process_L {
     }
 }
 
+sub _process_M {
+    my ($self, $data) = @_;
+    my ($i, $num, $base64) = $data =~ /([^,]+),([^,]+),(.*)/;
+
+    my $md_tmp = $self->{metadata_tmp} ||= [];
+    $md_tmp->[$i] = $base64;
+
+    if (@$md_tmp == $num) {
+        my $md = decode_base64 join "", @$md_tmp;
+        @$md_tmp = ();
+
+        $md =~ s/^V\x02// or croak "Unknown metadata version";
+        my $roomcount = unpack "C", $md;
+        my $offset = 1;
+        my $rooms = 0;
+        while ($rooms < $roomcount) {
+            my ($id, $name, $addr) = unpack "C C/a a3", substr $md, $offset;
+            $rooms++;
+            $offset += 5 + length $name;
+
+            $self->{rooms}{$id} ||= Max::Room->new(
+                max  => $self,
+                id   => $id,
+                name => $name,
+                addr => $addr
+            );
+        }
+
+        ## NOT USED {
+        my $devcount = unpack "C", substr $md, $offset;
+        $offset++;
+        my $devs = 0;
+        while ($devs < $devcount) {
+            my ($type, $addr, $serial, $name, $room_id)
+                = unpack "C a3 a10 C/a C", substr $md, $offset;
+            $devs++;
+            $offset += 16 + length $name;
+        }
+        ## }
+    }
+}
+
 sub _send {
     my ($self, $prefix, $hexdata) = @_;
     $hexdata ||= "";
@@ -113,34 +185,15 @@ sub _readline {
 sub init {
     my ($self) = @_;
 
-    my $devices = $self->{devices} ||= {};
-    my $rooms   = $self->{rooms}   ||= {};
+    $self->{devices} = {};
+    $self->{rooms}   = {};
 
     LINE: while (my $line = $self->_readline) {
-        if ($line =~ /^C:([^,]+),(.*)/) {
-            my ($addr_hex, $data) = (lc $1, decode_base64 $2);
-            my ($length, $addr2, $type, $room, $fw, $test, $serial)
-                = unpack("C a3 C C C C a10", $data);
-
-            my $addr2_hex = unpack "H*", $addr2;
-            warn "Address mismatch in 'C' response ($addr_hex != $addr2_hex)\n"
-                if $addr2_hex ne $addr_hex;
-
-            my $device = Max::Device->new(
-                max         => $self,
-                addr        => $addr2,
-                type        => $type,
-                firmware    => sprintf("%.1f", $fw/10),  # guessed
-                test_result => $test,
-                serial      => $serial,
-            );
-
-            $devices->{$addr2} = $device;
-            if ($room) {
-                $rooms->{$room} ||= Max::Room->new(max => $self, id => $room);
-                $rooms->{$room}->add_device($device);
-                $device->_set(room => $rooms->{$room});
-            }
+        if ($line =~ /^M:(.*)/) {
+            $self->_process_M($1);
+        }
+        if ($line =~ /^C:(.*)/) {
+            $self->_process_C($1);
         }
         if ($line =~ /^L:(.*)/) {
             $self->_process_L($1);
@@ -192,6 +245,35 @@ sub room {
     my ($self, $room) = @_;
     $room += 0;
     return $self->{rooms}{$room} ||= Max::Room->new(max => $self, id => $room);
+}
+
+sub write_metadata {
+    my ($self) = @_;
+
+    my @rooms = $self->rooms;
+    my @devices = $self->devices;
+    my $base64 = encode_base64(
+        join("",
+            "V\x02",  # Version?
+            pack("C", scalar @rooms),
+            map(pack(
+                "C C/a a3",
+                $_->id, $_->name // "", $_->addr
+            ), @rooms),
+            pack("C", scalar @devices),
+            map(pack(
+                "C a3 a10 C/a C",
+                $_->type_num, $_->addr, $_->serial//"", $_->name//"",
+                $_->room->id
+            ), @devices)
+        ),
+        ""
+    );
+    my @blocks = unpack "(a1900)*", $base64;
+    for (my $i = 0; $i < @blocks; $i++) {
+        $self->_send(sprintf "m:%02x,%s", $i, $blocks[$i]);
+        $self->_waitfor("A");
+    }
 }
 
 1;

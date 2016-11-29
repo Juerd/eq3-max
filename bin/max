@@ -109,7 +109,7 @@ sub do_summary {
         my @devices = $room->devices;
         next if @devices == 1 and $devices[0]->is_cube;
 
-        printf "[Room %d]\n", $room->id;
+        printf "[Room %d: %s]\n", $room->id, $room->name // "unnamed";
         for my $device (@devices) {
             my $extra = 
                 $device->has_temperature
@@ -147,6 +147,16 @@ sub do_switch {
     $command = sprintf $command, $switch ? $on : $off;
     print "Executing: $command\n";
     system $command;
+}
+
+sub do_name {
+    my ($room_id, $name) = @_;
+
+    my $max = Max->connect($host)->init;
+    my $room = $max->room($room_id);
+    $room->devices or die "No devices in room $room_id.\n";
+    $room->name($name);
+    $max->write_metadata;
 }
 
 my $command = shift || 'summary';

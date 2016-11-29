@@ -19,7 +19,8 @@ sub _set {
 
 sub addr        { shift->{addr} }
 sub addr_hex    { lc unpack "H*", shift->{addr} }
-sub name        { shift->{name} // "" }
+sub name        { shift->{name} }
+sub serial      { shift->{serial} }
 sub setpoint    { shift->{setpoint} }
 sub valve       { shift->{valve} }
 sub temperature { shift->{temperature} }

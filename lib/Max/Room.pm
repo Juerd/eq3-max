@@ -17,7 +17,13 @@ sub _set {
 }
 
 sub id { shift->{id} }
-sub name { shift->{name} // "" }
+sub addr { shift->{addr} // "\0\0\0" }
+
+sub name { 
+    my ($self, $new) = @_;
+    return $self->{name} if not defined $new;
+    return $self->{name} = $new;
+}
 
 sub devices {
     my ($self) = @_;
