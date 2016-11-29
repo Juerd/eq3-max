@@ -19,7 +19,6 @@ sub _set {
 
 sub addr        { shift->{addr} }
 sub addr_hex    { lc unpack "H*", shift->{addr} }
-sub name        { shift->{name} }
 sub serial      { shift->{serial} }
 sub setpoint    { shift->{setpoint} }
 sub valve       { shift->{valve} }
@@ -29,6 +28,12 @@ sub type_num {        shift->{type}  }
 sub type     { $types{shift->{type}} }
 sub mode_num {        shift->{mode}  }
 sub mode     { $modes{shift->{mode}} }
+
+sub name {
+    my ($self, $new) = @_;
+    return $self->{name} if not defined $new;
+    return $self->{name} = $new;
+}
 
 sub flags_as_string {
     my ($self) = @_;

@@ -111,8 +111,8 @@ sub do_summary {
         my @devices = $room->devices;
         next if @devices == 1 and $devices[0]->is_cube;
 
-        printf "* %s(%d)\n", $room->name, $room->id if defined $room->name;
-        printf "* room %d\n", $room->id if not defined $room->name;
+        printf "* %s(%d)\n", $room->name, $room->id if $room->name;
+        printf "* room %d\n", $room->id if not $room->name;
 
         for my $device (@devices) {
             my $extra = 
@@ -123,8 +123,8 @@ sub do_summary {
                 : "";
 
             printf(
-                "    %-10s %s: %s\@%.1f %s%s\n",
-                $device->type,
+                "    %-15s %s: %s\@%.1f %s%s\n",
+                $device->name || $device->type,
                 $device->addr_hex,
                 $device->mode,
                 $device->setpoint,
@@ -154,12 +154,20 @@ sub do_switch {
 }
 
 sub do_name {
-    my ($room_id, $name) = @_;
+    my ($id, $name) = @_;
+
+    $id and defined $name or die "Usage: $0 name <id|room> <name>\n";
+    ($name) = $name =~ /^([\x20-\xFF]{0,32})$/ or die "Invalid name.\n";
 
     my $max = Max->connect($host)->init;
-    my $room = $max->room($room_id);
-    $room->devices or die "No devices in room $room_id.\n";
-    $room->name($name);
+    if (length($id) == 6) {
+        my $device = $max->device($id) or die "No such device $id.\n";
+        $device->name($name);
+    } else {
+        my $room = $max->room($id);
+        $room->devices or die "No devices in room $id.\n";
+        $room->name($name);
+    }
     $max->write_metadata;
 }
 

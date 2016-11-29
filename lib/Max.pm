@@ -146,6 +146,7 @@ sub _process_M {
         my $rooms = 0;
         while ($rooms < $roomcount) {
             my ($id, $name, $addr) = unpack "C C/a a3", substr $md, $offset;
+
             $rooms++;
             $offset += 5 + length $name;
 
@@ -157,17 +158,20 @@ sub _process_M {
             );
         }
 
-        ## NOT USED {
         my $devcount = unpack "C", substr $md, $offset;
         $offset++;
         my $devs = 0;
         while ($devs < $devcount) {
             my ($type, $addr, $serial, $name, $room_id)
                 = unpack "C a3 a10 C/a C", substr $md, $offset;
+
             $devs++;
             $offset += 16 + length $name;
+
+            # At this point, store just the name, because the rest comes from
+            # the C and L messages, which are more authoritative.
+            $self->{devicenames}{$addr} = $name;
         }
-        ## }
     }
 }
 
@@ -200,6 +204,12 @@ sub init {
             last LINE;
         }
     }
+
+    for my $device ($self->devices) {
+        my $name = delete $self->{devicenames}{ $device->addr } or next;
+        $device->name($name);
+    }
+
     return $self;
 }
 
@@ -234,6 +244,13 @@ sub disconnect {
 sub devices {
     my ($self) = @_;
     return @{ $self->{devices} }{ sort keys %{$self->{devices}} };
+}
+
+sub device {
+    my ($self, $addr) = @_;
+    $addr = pack "H*", $addr if length($addr) == 6;
+    return undef if not exists $self->{devices}{$addr};
+    return $self->{devices}{$addr};
 }
 
 sub rooms {

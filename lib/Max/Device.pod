@@ -49,6 +49,15 @@ Returns the address in binary form.
 
 Returns the address as 6 hexadecimal digits.
 
+=head3 name
+
+Returns the configured name (binary).
+
+=head3 name($name)
+
+Sets a new name, but does not write the metadata to the cube. Use
+C<< $max->write_metadata >> to store the new name.
+
 =head3 room
 
 Returns the Max::Room object for the associated room.

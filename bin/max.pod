@@ -55,6 +55,11 @@ argument.
 
 C<on> defaults to C<1>, C<off> defaults to C<0>.
 
+=head3 name <room|device> <name>
+
+Sets the name for a room (numeric id) or device (6 digit hexadecimal id) and
+writes the metadata back to the Cube.
+
 =head2 Environment variables
 
 =head3 MAX_HOST
