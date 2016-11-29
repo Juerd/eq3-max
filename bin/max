@@ -89,14 +89,18 @@ sub do_dump {
 
 sub do_set {
     my ($room_id, $setpoint) = @_;
+    $room_id ||= 0;
 
     my $usage = "Usage: $0 manual <roomid> <temperature per 0.5>\n";
-    _valid_uint8($room_id) && $room_id > 0 or die $usage;
+    $room_id eq 'all' or _valid_uint8($room_id) && $room_id > 0 or die $usage;
     _valid_temperature($setpoint) or die $usage;
 
     my $max = Max->connect($host)->init;
-    my $room = $max->room($room_id) or die "There is no room $room_id";
-    $room->set_temperature($setpoint) or die "Setting temperature failed";
+
+    for my $room ($room_id eq 'all' ? $max->rooms : $max->room($room_id)) {
+        $room->devices or warn "No devices in room " . $room->id . "\n";
+        $room->set_temperature($setpoint) or die "Setting temperature failed";
+    }
 }
 
 sub do_summary {
