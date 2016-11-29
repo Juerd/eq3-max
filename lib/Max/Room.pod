@@ -62,6 +62,15 @@ temperature or setpoint is not known.
 Given a Max::Device object, adds it to the room object. Does not update the
 Cube's configuration; use C<< $device->set_room >> for that.
 
+=head3 name
+
+Returns the configured name (binary).
+
+=head3 name($name)
+
+Sets a new name, but does not write the metadata to the cube. Use
+C<< $max->write_metadata >> to store the new name.
+
 =head1 CAVEATS
 
 =over
