@@ -9,9 +9,9 @@ Max::Device - Class to represent an eQ-3 Max! device
     for my $device ($max->devices) { ... }
     for my $device ($room->devices) { ... }
 
-    $device->room->set_temperature(21.5);
+    $device->room->setpoint(21.5);
 
-    my $room = $device->set_room(42);
+    my $room = $device->room(42);
     $device->add_link($other_device);
 
     if ($device->has_temperature) {
@@ -43,15 +43,30 @@ Considered an internal method; should not be called directly.
 
 =head3 addr
 
-Returns the 6 digit hexadecimal address.
+Returns the address in binary form.
+
+=head3 addr_hex
+
+Returns the address as 6 hexadecimal digits.
 
 =head3 room
 
 Returns the Max::Room object for the associated room.
 
+=head3 room($room)
+
+Given a Max::Room object or a numeric room ID, configures the device to
+associate with that room.
+
+Returns undef on failure. Returns a Max::Room object on success, and updates
+the Max::Room object in the parent Max object.
+
 =head3 setpoint
 
 Returns the currently target temperature.
+
+Setting the target temperature of individual devices is not supported; use
+C<< $device->room->setpoint >> to set the target for the entire room.
 
 =head3 temperature
 
@@ -98,14 +113,6 @@ Returns a space-joined list of flag in alphabetical order. Possible flags are:
 =head3 has_temperature, has_valve, is_cube
 
 Returns a boolean value according to the device type.
-
-=head3 set_room($room)
-
-Given a Max::Room object or a numeric room ID, configures the device to
-associate with that room.
-
-Returns undef on failure. Returns a Max::Room object on success, and updates
-the Max::Room object in the parent Max object.
 
 =head3 add_link($device)
 

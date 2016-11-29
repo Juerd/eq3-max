@@ -24,13 +24,6 @@ Considered an internal method; should not be called directly.
 
 =head2 Instance methods
 
-=head3 set_temperature($temperature)
-
-Sends a new B<manual> setpoint temperature to all the devices in the room. The
-new temperature must be a multiple of 0.5.
-
-Currently does not handle errors.
-
 =head3 devices
 
 Returns a list of discovered devices as Max::Device objects. The order is not
@@ -50,6 +43,13 @@ If a wall thermostat is present, its temperature is preferred. Without any wall
 thermostat, will use any other device's reported setpoint.
 
 Returns undef if the setting is not known.
+
+=head3 setpoint($temperature)
+
+Sends a new B<manual> setpoint temperature to all the devices in the room. The
+new temperature must be a multiple of 0.5.
+
+Currently does not handle errors.
 
 =head3 too_cold([$maxdelta])
 

@@ -18,7 +18,8 @@ sub _set {
 }
 
 sub addr        { shift->{addr} }
-sub room        { shift->{room} }
+sub addr_hex    { lc unpack "H*", shift->{addr} }
+sub name        { shift->{name} // "" }
 sub setpoint    { shift->{setpoint} }
 sub valve       { shift->{valve} }
 sub temperature { shift->{temperature} }
@@ -37,11 +38,16 @@ sub has_temperature { shift->{type} == 3 }
 sub has_valve       { $_[0]->{type} == 1 or $_[0]->{type} == 2 }
 sub is_cube         { shift->{type} == 0 }
 
-sub set_room {
+sub room {
     my ($self, $new) = @_;
 
+    return $self->{room} if not defined $new;
+
     my $id = ref($new) ? $new->id : $new;
-    $self->{max}->_send("s:", sprintf "000022000000$self->{addr}00%02x", $id);
+    $self->{max}->_send("s:", sprintf "000022000000%s00%02x",
+        $self->addr_hex,
+        $id
+    );
     $self->{max}->_command_success("S") or return;
 
     my $room = $self->{max}->room($id);
@@ -52,9 +58,10 @@ sub set_room {
 
 sub add_link {
     my ($self, $other) = @_;
-    $self->{max}->_send("s:", sprintf "000020000000$self->{addr}%02x%s%s",
+    $self->{max}->_send("s:", sprintf "000020000000%s%02x%s%02x",
+        $self->addr_hex,
         $other->room->id,
-        $other->addr,
+        $other->addr_hex,
         $other->type_num,
     );
     return $self->{max}->_command_success("S");

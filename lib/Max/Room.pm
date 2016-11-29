@@ -16,7 +16,8 @@ sub _set {
     @{ $self }{keys %p} = values %p;
 }
 
-sub id { shift->{id} };
+sub id { shift->{id} }
+sub name { shift->{name} // "" }
 
 sub devices {
     my ($self) = @_;
@@ -32,7 +33,7 @@ sub temperature {
     return undef;
 }
 
-sub setpoint {
+sub _get_setpoint {
     my ($self) = @_;
 
     for my $device ($self->devices) {
@@ -45,6 +46,21 @@ sub setpoint {
         return $device->setpoint if $device->setpoint > 0;
     }
     return undef;
+}
+
+sub setpoint {
+    my ($self, $new) = @_;
+
+    return $self->_get_setpoint if not defined $new;
+
+    my $t2 = $new * 2;
+    ($t2 == int $t2) or croak "Temperature not a multiple of 0.5";
+    $t2 > 0 or $t2 < 256 or croak "Invalid temperature ($new)";
+
+    $self->{max}->_send("s:", sprintf "000440000000000000%02x%02x",
+        $self->id,
+        $t2 | 0x40,
+    );
 }
 
 sub too_cold {
@@ -61,18 +77,6 @@ sub add_device {
     my ($self, $device) = @_;
     $device->isa("Max::Device") or croak "Not a Max::Device";
     $self->{devices}{ $device->addr } = $device;
-}
-
-sub set_temperature {
-    my ($self, $temperature) = @_;
-    my $t2 = $temperature * 2;
-    ($t2 == int $t2) or croak "Temperature not a multiple of 0.5";
-    $t2 > 0 or $t2 < 256 or croak "Invalid temperature ($temperature)";
-
-    $self->{max}->_send("s:", sprintf "000440000000000000%02x%02x",
-        $self->id,
-        $t2 | 0x40,
-    );
 }
 
 1;

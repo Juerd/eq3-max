@@ -74,16 +74,14 @@ sub _process_L {
     my $data = decode_base64 $base64;
     my @devices = unpack "(C/a)*", $data;
     for my $devicedata (@devices) {
-        my ($addr_bin, undef, $flags, $valve, $setpoint, $date, $time, $temp)
+        my ($addr, undef, $flags, $valve, $setpoint, $date, $time, $temp)
             = unpack "a3 C n C C n C C", $devicedata;
-
-        my $addr = lc unpack "H*", $addr_bin;
 
         $temp |= !!($setpoint & 0x80) << 8;
         $setpoint &= 0x7F;
 
         my $device = $self->{devices}{$addr}
-            or warn "Unexpected device $addr";
+            or warn "Unexpected device " . unpack("H*", $addr);
 
         $device->_set(
             flags => {
@@ -120,14 +118,13 @@ sub init {
 
     LINE: while (my $line = $self->_readline) {
         if ($line =~ /^C:([^,]+),(.*)/) {
-            my ($addr, $data) = (lc $1, decode_base64 $2);
+            my ($addr_hex, $data) = (lc $1, decode_base64 $2);
             my ($length, $addr2, $type, $room, $fw, $test, $serial)
                 = unpack("C a3 C C C C a10", $data);
 
-            $addr2 = lc unpack "H*", $addr2;
-
-            warn "Address mismatch in 'C' response ($addr, $addr2)\n"
-                if $addr ne $addr2;
+            my $addr2_hex = unpack "H*", $addr2;
+            warn "Address mismatch in 'C' response ($addr_hex != $addr2_hex)\n"
+                if $addr2_hex ne $addr_hex;
 
             my $device = Max::Device->new(
                 max         => $self,
@@ -138,7 +135,7 @@ sub init {
                 serial      => $serial,
             );
 
-            $devices->{$addr} = $device;
+            $devices->{$addr2} = $device;
             if ($room) {
                 $rooms->{$room} ||= Max::Room->new(max => $self, id => $room);
                 $rooms->{$room}->add_device($device);
@@ -160,7 +157,6 @@ sub pair {
         or croak "No response";
     my ($type, $addr, $serial, $unknown) = unpack "C a3 a10 C", $response;
 
-    $addr = lc unpack "H*", $addr;
     my $device = $self->{devices}{$addr} = Max::Device->new(
         max => $self,
         type => $type,

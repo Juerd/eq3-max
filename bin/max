@@ -37,7 +37,7 @@ sub do_pair {
     print "Press and hold OK/Boost on the new device...\n";
     my $device = $max->pair();
     print "Pairing done; setting room ID...\n";
-    my $success = $device->set_room($room);
+    my $success = $device->room($room);
     print $success ? "Pairing succesful.\n" : "Pairing failed.\n";
 }
 
@@ -67,8 +67,8 @@ sub do_crosslink {
         for my $other (@others) {
             printf(
                 "Telling %s %s about %s %s...",
-                $dev->type, $dev->addr,
-                $other->type, $other->addr
+                $dev->type, $dev->addr_hex,
+                $other->type, $other->addr_hex
             );
             my $success = $dev->add_link($other);
             print $success ? " OK.\n" : " FAILED.\n";
@@ -99,7 +99,7 @@ sub do_set {
 
     for my $room ($room_id eq 'all' ? $max->rooms : $max->room($room_id)) {
         $room->devices or warn "No devices in room " . $room->id . "\n";
-        $room->set_temperature($setpoint) or die "Setting temperature failed";
+        $room->setpoint($setpoint) or die "Setting temperature failed";
     }
 }
 
@@ -121,7 +121,7 @@ sub do_summary {
             printf(
                 "    %-10s %s: %s\@%.1f %s%s\n",
                 $device->type,
-                $device->addr,
+                $device->addr_hex,
                 $device->mode,
                 $device->setpoint,
                 $extra,
