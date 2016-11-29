@@ -96,6 +96,19 @@ room:
     watch max
 ```
 
+Optionally, configure names for your rooms and devices:
+
+```
+    max name 2 "living room"
+    max name 123abc "radiator south"
+    max name 123def "radiator west"
+    max name 3 "master bedroom"
+    max name 4 "kitchen"
+    # etc...
+```
+
+You could store this as a script, in case you ever have to do it again.
+
 # Controlling a boiler for central heating
 
 You may skip this part if you don't have a boiler that needs to be switched.
