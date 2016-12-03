@@ -95,7 +95,7 @@ sub config_display {
     defined $byte or croak "Invalid setting for config_display: $setting";
     $self->type eq 'thermostat' or carp "config_display used on non-thermostat";
 
-    $self->{max}->_send("s:", sprintf "000082000000%s%02x",
+    $self->{max}->_send("s:", sprintf "000082000000%s00%02x",
         $self->addr_hex,
         $byte,
     );
