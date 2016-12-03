@@ -131,7 +131,8 @@ sub _process_L {
 
 sub _process_M {
     my ($self, $data) = @_;
-    my ($i, $num, $base64) = $data =~ /([^,]+),([^,]+),(.*)/;
+    my ($i, $num, $base64) = $data =~ /([^,]+),([^,]+),(.*)/
+        or return;
 
     my $md_tmp = $self->{metadata_tmp} ||= [];
     $md_tmp->[$i] = $base64;
