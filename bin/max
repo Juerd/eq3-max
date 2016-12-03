@@ -61,15 +61,15 @@ sub do_crosslink {
     my $max = Max->connect($host)->init;
     my $room = $max->room($room_id) or die "There is no room $room_id";
     my @devices = grep !$_->is_cube, $room->devices
-        or die "No devices in room $room_id";
+        or die "No devices in " . $room->display_name;
 
     for my $dev (@devices) {
         my @others = grep $_->addr ne $dev->addr, @devices;
         for my $other (@others) {
             printf(
-                "Telling %s %s about %s %s...",
-                $dev->type, $dev->addr_hex,
-                $other->type, $other->addr_hex
+                "Telling %s about %s...",
+                $dev->display_name_room,
+                $other->display_name,
             );
             my $success = $dev->add_link($other);
             print $success ? " OK.\n" : " FAILED.\n";
@@ -99,8 +99,9 @@ sub do_set {
     my $max = Max->connect($host)->init;
 
     for my $room ($room_id eq 'all' ? $max->rooms : $max->room($room_id)) {
-        $room->devices or warn "No devices in room " . $room->id . "\n";
-        $room->setpoint($setpoint) or die "Setting temperature failed";
+        $room->devices or warn "No devices in " . $room->display_name . ".\n";
+        print "Setting %s temperature to %s.\n", $room->display_name, $setpoint;
+        $room->setpoint($setpoint) or die "Setting temperature failed.\n";
     }
     print "Done.\n";
 }
@@ -111,8 +112,7 @@ sub do_summary {
         my @devices = $room->devices;
         next if @devices == 1 and $devices[0]->is_cube;
 
-        printf "* %s(%d)\n", $room->name, $room->id if $room->name;
-        printf "* room %d\n", $room->id if not $room->name;
+        printf "* %s\n", $room->display_name(1);
 
         for my $device (@devices) {
             next if $device->is_cube;
@@ -125,9 +125,8 @@ sub do_summary {
                 : "";
 
             printf(
-                "    %-15s %s: %s\@%.1f %s%s\n",
-                $device->name || $device->type,
-                $device->addr_hex,
+                "    %-25s %s\@%.1f %s%s\n",
+                $device->display_name(1),
                 $device->mode,
                 $device->setpoint,
                 $extra,
@@ -167,7 +166,7 @@ sub do_name {
         $device->name($name);
     } else {
         my $room = $max->room($id);
-        $room->devices or die "No devices in room $id.\n";
+        $room->devices or die "No devices in " . $room->display_name . ".\n";
         $room->name($name);
     }
     $max->write_metadata;
@@ -185,7 +184,7 @@ sub do_config {
     my @devices = grep {
         $selector eq 'all'
         or $_->type eq $selector
-        or $_->addr eq $selector
+        or $_->addr_hex eq $selector
         or $_->room->id eq $selector
     } $max->devices or die "No matching devices.\n";
 
@@ -196,11 +195,7 @@ sub do_config {
         @_ and die "Too many values.\n";
 
         for my $device (@devices) {
-            printf "Configuring %s %s in %s...",
-                $device->type,
-                $device->name || $device->addr_hex,
-                $device->room->name || "room " . $device->room->id;
-
+            printf "Configuring %s...", $device->display_name_room;
             print $device->config_display($setting) ? " OK\n" : " FAILED\n"
         }
         return;

@@ -35,6 +35,20 @@ sub name {
     return $self->{name} = $new;
 }
 
+sub display_name {
+    my ($self, $include_addr) = @_;
+    if (defined $self->{name} and length $self->{name}) {
+        return "$self->{name}(" . $self->addr_hex . ")" if $include_addr;
+        return $self->{name};
+    }
+    return $self->type . " " . $self->addr_hex;
+}
+
+sub display_name_room {
+    my ($self) = @_;
+    return $self->display_name . " in " . $self->room->display_name;
+}
+
 sub flags_as_string {
     my ($self) = @_;
     return join " ", grep $self->{flags}{$_}, sort keys %{ shift->{flags} };

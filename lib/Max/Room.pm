@@ -19,10 +19,19 @@ sub _set {
 sub id { shift->{id} }
 sub addr { shift->{addr} // "\0\0\0" }
 
-sub name { 
+sub name {
     my ($self, $new) = @_;
     return $self->{name} if not defined $new;
     return $self->{name} = $new;
+}
+
+sub display_name {
+    my ($self, $include_id) = @_;
+    if (defined $self->{name} and length $self->{name}) {
+        return "$self->{name}($self->{id})" if $include_id;
+        return $self->{name};
+    }
+    return "room " . $self->{id};
 }
 
 sub devices {
