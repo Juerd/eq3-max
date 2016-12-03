@@ -63,7 +63,6 @@ sub do_crosslink {
     my @devices = grep !$_->is_cube, $room->devices
         or die "No devices in room $room_id";
 
-    $| = 1;
     for my $dev (@devices) {
         my @others = grep $_->addr ne $dev->addr, @devices;
         for my $other (@others) {
@@ -173,6 +172,43 @@ sub do_name {
     }
     $max->write_metadata;
 }
+
+sub do_config {
+    my $selector = shift;
+    my $param = shift;
+
+    my $usage = "Usage: $0 config <id|room|type|all> <paramname> <values...>\n";
+    $selector or die $usage;
+    $selector =~ s/s$//;  # make singular
+
+    my $max = Max->connect($host)->init;
+    my @devices = grep {
+        $selector eq 'all'
+        or $_->type eq $selector
+        or $_->addr eq $selector
+        or $_->room->id eq $selector
+    } $max->devices or die "No matching devices.\n";
+
+    if ($param eq 'display') {
+        my ($setting) = shift =~ /(current|setpoint)/
+            or die "Invalid value. Valid are 'current' and 'setpoint'.\n";
+
+        @_ and die "Too many values.\n";
+
+        for my $device (@devices) {
+            printf "Configuring %s %s in %s...",
+                $device->type,
+                $device->name || $device->addr_hex,
+                $device->room->name || "room " . $device->room->id;
+
+            print $device->config_display($setting) ? " OK\n" : " FAILED\n"
+        }
+        return;
+    }
+    die "Unknown parameter: $param";
+}
+
+$| = 1;
 
 my $command = shift || 'summary';
 my $sub = $::{"do_$command"} or die "Unknown subcommand '$command'.\n";

@@ -73,4 +73,19 @@ sub add_link {
     return $self->{max}->_command_success("S");
 }
 
+sub config_display {
+    my ($self, $setting) = @_;
+    my $byte;
+    $byte = 0 if $setting eq 'setpoint';
+    $byte = 4 if $setting eq 'current';
+    defined $byte or croak "Invalid setting for config_display: $setting";
+    $self->type eq 'thermostat' or carp "config_display used on non-thermostat";
+
+    $self->{max}->_send("s:", sprintf "000082000000%s%02x",
+        $self->addr_hex,
+        $byte,
+    );
+    return $self->{max}->_command_success("S");
+}
+
 1;
