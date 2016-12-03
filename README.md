@@ -25,11 +25,31 @@ Please add detailed info about why the change was needed.
 
 # Installing
 
-This repository comes without an installer and installation is not necessary.
+## Prerequisites on a normal Linux system
+
+All regular Linux distributions come with Perl and Perl modules pre-installed.
+
+## Prerequisites on an OpenWRT system
+
+To run this program on a router running OpenWRT, install perl and its core
+modules:
+
+```
+    opkg update
+    opkg install perl perlbase-essential perlbase-config perlbase-cwd \
+        perlbase-findbin perlbase-io perlbase-list perlbase-mime \
+        perlbase-socket
+```
+
+## Installation
+
+This repository comes without an installer and installation is not necessary
+because you can run it from the repository.
+
 But you could do something like:
 
 ```
-    git clone https://github.com/Juerd/eq3-max /opt/eq3-max
+    git clone git://github.com/Juerd/eq3-max /opt/eq3-max
     ln -s /opt/eq3-max/bin/* /usr/local/bin
 ```
 
