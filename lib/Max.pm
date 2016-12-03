@@ -62,13 +62,6 @@ sub _waitfor {
     return undef;
 }
 
-sub _command_success {
-    my ($self) = @_;
-    my $response = $self->_waitfor("S");
-    my (undef, $error, undef) = split /,/, $response;
-    return !$error;
-}
-
 sub _process_C {
     my ($self, $data) = @_;
     my ($addr_hex, $base64) = $data =~ /([^,]+),(.*)/;
@@ -180,6 +173,23 @@ sub _send {
     my ($self, $prefix, $hexdata) = @_;
     $hexdata ||= "";
     $self->{sock}->print($prefix, encode_base64(pack "H*", $hexdata), "\r\n");
+}
+
+sub _send_radio {
+    my ($self, $command, $hexdata, %param) = @_;
+    $param{device} or $param{room} or croak "no device or room in _send_radio";
+    my $from  = delete $param{from}   // "000000";   # hex
+    my $to    = delete $param{device} // "000000";   # hex
+    my $room  = delete $param{room}   // 0;  # int
+
+    $self->_send("s:", sprintf(
+        "00%02x%02x%s%s%02x%s",
+        $room && $to eq "000000" ? 4 : 0, $command, $from, $to, $room, $hexdata
+    ));
+
+    my $response = $self->_waitfor("S");
+    my (undef, $error, undef) = split /,/, $response;
+    return !$error;
 }
 
 sub _readline {

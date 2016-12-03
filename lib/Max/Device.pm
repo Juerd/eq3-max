@@ -17,6 +17,16 @@ sub _set {
     @{ $self }{keys %p} = values %p;
 }
 
+sub _send_radio {
+    my ($self, $command, $hexdata) = @_;
+
+    return $self->{max}->_send_radio(
+        $command, $hexdata,
+        device => $self->addr_hex,
+        room => $self->{room} ? $self->room->id : 0
+    );
+}
+
 sub addr        { shift->{addr} }
 sub addr_hex    { lc unpack "H*", shift->{addr} }
 sub serial      { shift->{serial} }
@@ -64,11 +74,7 @@ sub room {
     return $self->{room} if not defined $new;
 
     my $id = ref($new) ? $new->id : $new;
-    $self->{max}->_send("s:", sprintf "000022000000%s00%02x",
-        $self->addr_hex,
-        $id
-    );
-    $self->{max}->_command_success("S") or return;
+    $self->_send_radio(0x22, sprintf "%02x", $id) or return;
 
     my $room = $self->{max}->room($id);
     $room->add_device($self);
@@ -78,28 +84,21 @@ sub room {
 
 sub add_link {
     my ($self, $other) = @_;
-    $self->{max}->_send("s:", sprintf "000020000000%s%02x%s%02x",
-        $self->addr_hex,
-        $other->room->id,
-        $other->addr_hex,
-        $other->type_num,
-    );
-    return $self->{max}->_command_success("S");
+
+    my $hexdata = sprintf("%s%02x", $other->addr_hex, $other->type_num);
+    return $self->_send_radio(0x20, $hexdata);
 }
 
 sub config_display {
     my ($self, $setting) = @_;
-    my $byte;
-    $byte = 0 if $setting eq 'setpoint';
-    $byte = 4 if $setting eq 'current';
-    defined $byte or croak "Invalid setting for config_display: $setting";
+    my $hexdata;
+    $hexdata = "00" if $setting eq 'setpoint';
+    $hexdata = "04" if $setting eq 'current';
+    defined $hexdata or croak "Invalid setting for config_display: $setting";
+
     $self->type eq 'thermostat' or carp "config_display used on non-thermostat";
 
-    $self->{max}->_send("s:", sprintf "000082000000%s00%02x",
-        $self->addr_hex,
-        $byte,
-    );
-    return $self->{max}->_command_success("S");
+    return $self->_send_radio(0x82, $hexdata);
 }
 
 1;

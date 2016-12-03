@@ -100,7 +100,7 @@ sub do_set {
 
     for my $room ($room_id eq 'all' ? $max->rooms : $max->room($room_id)) {
         $room->devices or warn "No devices in " . $room->display_name . ".\n";
-        print "Setting %s temperature to %s.\n", $room->display_name, $setpoint;
+        printf "Setting %s temperature to %s.\n", $room->display_name, $setpoint;
         $room->setpoint($setpoint) or die "Setting temperature failed.\n";
     }
     print "Done.\n";

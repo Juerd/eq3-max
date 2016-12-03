@@ -16,6 +16,12 @@ sub _set {
     @{ $self }{keys %p} = values %p;
 }
 
+sub _send_radio {
+    my ($self, $command, $hexdata) = @_;
+
+    return $self->{max}->_send_radio($command, $hexdata, room => $self->id);
+}
+
 sub id { shift->{id} }
 sub addr { shift->{addr} // "\0\0\0" }
 
@@ -72,10 +78,7 @@ sub setpoint {
     ($t2 == int $t2) or croak "Temperature not a multiple of 0.5";
     $t2 > 0 or $t2 < 256 or croak "Invalid temperature ($new)";
 
-    $self->{max}->_send("s:", sprintf "000440000000000000%02x%02x",
-        $self->id,
-        $t2 | 0x40,
-    );
+    return $self->_send_radio(0x40, sprintf "%02x", $t2 | 0x40);
 }
 
 sub too_cold {
