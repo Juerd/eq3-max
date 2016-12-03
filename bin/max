@@ -60,7 +60,8 @@ sub do_crosslink {
 
     my $max = Max->connect($host)->init;
     my $room = $max->room($room_id) or die "There is no room $room_id";
-    my @devices = $room->devices or die "No devices in room $room_id";
+    my @devices = grep !$_->is_cube, $room->devices
+        or die "No devices in room $room_id";
 
     $| = 1;
     for my $dev (@devices) {
@@ -115,6 +116,8 @@ sub do_summary {
         printf "* room %d\n", $room->id if not $room->name;
 
         for my $device (@devices) {
+            next if $device->is_cube;
+
             my $extra = 
                 $device->has_temperature
                 ? sprintf("(current %.1f) ", $device->temperature)
