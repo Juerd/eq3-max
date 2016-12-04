@@ -41,6 +41,14 @@ Considered an internal method; should not be called directly.
 
 =head2 Instance methods
 
+=head3 add_link($device)
+
+Given another Max::Device object, sets up a unidirectional link between the
+devices. In a typical situation, devices will be cross-linked, but this method
+does not automate that.
+
+Returns true on success, false on failure.
+
 =head3 addr
 
 Returns the address in binary form.
@@ -48,6 +56,42 @@ Returns the address in binary form.
 =head3 addr_hex
 
 Returns the address as 6 hexadecimal digits.
+
+=head3 config_display('current'|'setpoint')
+
+Configures the device to display either the current temperature, or the
+setpoint temperature. Will work on wall thermostats, or emit a warning
+otherwise.
+
+=head3 display_name($include_addr)
+
+Returns the configured name, or a string comprised of the device's type and
+address. The address is added, even for devices that have a configured name,
+if the argument C<$include_addr> is true.
+
+=head3 flags_as_string
+
+Returns a space-joined list of flag in alphabetical order. Possible flags are:
+
+    init
+    link
+    battery
+    error
+    invalid
+
+=head3 has_temperature, has_valve, is_cube
+
+Returns a boolean value according to the device type.
+
+=head3 mode_num, mode
+
+Returns the current mode as a number, or as a string.
+Possible modes are:
+
+    0 auto
+    1 manual
+    2 vacation
+    3 boost
 
 =head3 name
 
@@ -70,6 +114,10 @@ associate with that room.
 Returns undef on failure. Returns a Max::Room object on success, and updates
 the Max::Room object in the parent Max object.
 
+=head3 serial
+
+Returns the device's serial number.
+
 =head3 setpoint
 
 Returns the currently target temperature.
@@ -81,11 +129,6 @@ C<< $device->room->setpoint >> to set the target for the entire room.
 
 Returns the measured temperature. Note: not all devices support this feature.
 Most notably, the TRVs don't. Use C<has_temperature> to test this.
-
-=head3 valve
-
-Returns the current position of the valve. 0 is fully closed, 100 is fully open.
-Note: not all devices have a valve. Use C<has_valve> to test this.
 
 =head3 type_num, type
 
@@ -99,37 +142,10 @@ Possible types are:
     4 shutter
     5 button
 
-=head3 mode_num, mode
+=head3 valve
 
-Returns the current mode as a number, or as a string.
-Possible modes are:
-
-    0 auto
-    1 manual
-    2 vacation
-    3 boost
-
-=head3 flags_as_string
-
-Returns a space-joined list of flag in alphabetical order. Possible flags are:
-
-    init
-    link
-    battery
-    error
-    invalid
-
-=head3 has_temperature, has_valve, is_cube
-
-Returns a boolean value according to the device type.
-
-=head3 add_link($device)
-
-Given another Max::Device object, sets up a unidirectional link between the
-devices. In a typical situation, devices will be cross-linked, but this method
-does not automate that.
-
-Returns true on success, false on failure.
+Returns the current position of the valve. 0 is fully closed, 100 is fully open.
+Note: not all devices have a valve. Use C<has_valve> to test this.
 
 =head1 CAVEATS
 

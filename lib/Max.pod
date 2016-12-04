@@ -41,15 +41,28 @@ that the first device to respond is a Max! Cube with no further checks.
 
 =head2 Instance methods
 
+=head3 device($id)
+
+Returns the Max::Device object for the given device address, provided either in
+binary or as a 6-digit hexadecimal string. Returns undef if no such device is
+registered.
+
+=head3 devices
+
+Returns a list of discovered devices as Max::Device objects. The order is not
+guaranteed.
+
+In scalar context, returns the number of devices.
+
+=head3 disconnect
+
+Disconnects gracefully. No methods involving communication with the Cube should
+be called after disconnecting.
+
 =head3 init
 
 Handles the incoming data immediately after connecting. As such, it must
 be called immediately after connecting.
-
-=head3 pair
-
-Initiates device pairing on the Cube. If successful, returns a Max::Device
-object that represents the newly paired device. Dies on recognised errors.
 
 =head3 forget($dev)
 
@@ -57,10 +70,10 @@ Given a Max::Device or a 6-digit hexadecimal address, removes the indicated
 device from the Cube. Does not (yet) remove the device from the internal cache,
 so even after forget(), it will still be listed.
 
-=head3 disconnect
+=head3 pair
 
-Disconnects gracefully. No methods involving communication with the Cube should
-be called after disconnecting.
+Initiates device pairing on the Cube. If successful, returns a Max::Device
+object that represents the newly paired device. Dies on recognised errors.
 
 =head3 room($id)
 
@@ -73,12 +86,11 @@ Returns a list of discovered rooms as Max::Room objects, ordered by ID.
 
 In scalar context, returns the number of rooms.
 
-=head3 devices
+=head3 write_metadata
 
-Returns a list of discovered devices as Max::Device objects. The order is not
-guaranteed.
-
-In scalar context, returns the number of devices.
+Writes the metadata (such as room and device names) back to the Cube. Will
+overwrite the existing metadata on the device with the current client-side
+state.
 
 =head1 SECURITY CONSIDERATIONS
 

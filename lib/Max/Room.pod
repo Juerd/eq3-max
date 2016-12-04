@@ -24,6 +24,11 @@ Considered an internal method; should not be called directly.
 
 =head2 Instance methods
 
+=head3 add_device($device)
+
+Given a Max::Device object, adds it to the room object. Does not update the
+Cube's configuration; use C<< $device->set_room >> for that.
+
 =head3 devices
 
 Returns a list of discovered devices as Max::Device objects. The order is not
@@ -31,10 +36,20 @@ guaranteed.
 
 In scalar context, returns the number of devices.
 
-=head3 temperature
+=head3 display_name($include_id)
 
-Returns the actual temperature as reported by a wall thermostat in the room.
-Returns undef if the temperature is not known.
+Returns the configured name, or a string comprised of the word "room" and the
+rooms' numeric ID. The ID is added, even for rooms that have a configured name,
+if the argument C<$include_id> is true.
+
+=head3 name
+
+Returns the configured name (binary).
+
+=head3 name($name)
+
+Sets a new name, but does not write the metadata to the cube. Use
+C<< $max->write_metadata >> to store the new name.
 
 =head3 setpoint
 
@@ -51,25 +66,16 @@ new temperature must be a multiple of 0.5.
 
 Currently does not handle errors.
 
+=head3 temperature
+
+Returns the actual temperature as reported by a wall thermostat in the room.
+Returns undef if the temperature is not known.
+
 =head3 too_cold([$maxdelta])
 
 Returns true if the measured temperature is more than C<$maxdelta> degrees
 colder than the setpoint. The parameter defaults to 0. Returns undef if the
 temperature or setpoint is not known.
-
-=head3 add_device($device)
-
-Given a Max::Device object, adds it to the room object. Does not update the
-Cube's configuration; use C<< $device->set_room >> for that.
-
-=head3 name
-
-Returns the configured name (binary).
-
-=head3 name($name)
-
-Sets a new name, but does not write the metadata to the cube. Use
-C<< $max->write_metadata >> to store the new name.
 
 =head1 CAVEATS
 
