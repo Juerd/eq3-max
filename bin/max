@@ -34,7 +34,7 @@ sub do_pair {
     my $usage = "Usage: $0 pair <roomid>\n";
     _valid_uint8($room) && $room > 0 or die $usage;
 
-    $max ||= Max->connect($host)->init;
+    $max ||= Max->connect($host);
     print "Press and hold OK/Boost on the new device...\n";
     my $device = $max->pair();
     print "Pairing done; setting room ID...\n";
@@ -48,7 +48,7 @@ sub do_forget {
     my $usage = "Usage: $0 forget <addr>\n";
     ($addr) = (lc $addr // "") =~ /^([0-9A-Fa-f]{6})$/ or die $usage;
 
-    $max ||= Max->connect($host)->init;
+    $max ||= Max->connect($host);
     $max->forget($addr);
     print "Done.\n";
 }
@@ -59,7 +59,7 @@ sub do_crosslink {
     my $usage = "Usage: $0 crosslink <roomid>\n";
     _valid_uint8($room_id) && $room_id > 0 or die $usage;
 
-    $max ||= Max->connect($host)->init;
+    $max ||= Max->connect($host);
     my $room = $max->room($room_id) or die "There is no room $room_id";
     my @devices = grep !$_->is_cube, $room->devices
         or die "No devices in " . $room->display_name;
@@ -85,7 +85,7 @@ sub do_dump {
     $Data::Dumper::Indent   = 1;
     $Data::Dumper::Purity   = 0;
     $Data::Dumper::Maxdepth = 2;
-    $max ||= Max->connect($host)->init;
+    $max ||= Max->connect($host);
     print Data::Dumper::Dumper($max->devices);
 }
 
@@ -97,7 +97,7 @@ sub do_set {
     $room_id eq 'all' or _valid_uint8($room_id) && $room_id > 0 or die $usage;
     _valid_temperature($setpoint) or die $usage;
 
-    $max ||= Max->connect($host)->init;
+    $max ||= Max->connect($host);
 
     for my $room ($room_id eq 'all' ? $max->rooms : $max->room($room_id)) {
         $room->devices or warn "No devices in " . $room->display_name . ".\n";
@@ -108,7 +108,7 @@ sub do_set {
 }
 
 sub do_summary {
-    $max ||= Max->connect($host)->init;
+    $max ||= Max->connect($host);
     for my $room ($max->rooms) {
         my @devices = $room->devices;
         next if @devices == 1 and $devices[0]->is_cube;
@@ -144,7 +144,7 @@ sub do_switch {
     $on  //= 1;
     $off //= 0;
 
-    $max ||= Max->connect($host)->init;
+    $max ||= Max->connect($host);
 
     my $switch = grep $_->too_cold, $max->rooms;
     my @valves = map $_->valve, grep $_->has_valve, $max->devices;
@@ -161,7 +161,7 @@ sub do_name {
     $id and defined $name or die "Usage: $0 name <id|room> <name>\n";
     ($name) = $name =~ /^([\x20-\xFF]{0,32})$/ or die "Invalid name.\n";
 
-    $max ||= Max->connect($host)->init;
+    $max ||= Max->connect($host);
     if (length($id) == 6) {
         my $device = $max->device($id) or die "No such device $id.\n";
         $device->name($name);
@@ -181,7 +181,7 @@ sub do_config {
     $selector or die $usage;
     $selector =~ s/s$//;  # make singular
 
-    $max ||= Max->connect($host)->init;
+    $max ||= Max->connect($host);
     my @devices = grep {
         $selector eq 'all'
         or $_->type eq $selector

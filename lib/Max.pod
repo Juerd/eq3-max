@@ -7,9 +7,9 @@ Max - Perl interface for "eQ-3 MAX! Cube LAN Gateway"
     use Max;
 
     my $host = Max->discover or die;
-    my $max = Max->connect($host)->init;
+    my $max = Max->connect($host);
 
-    my $max = Max->connect("192.168.1.9")->init;
+    my $max = Max->connect("192.168.1.9");
 
     for my $device ($max->devices) { ... }
     for my $room ($max->rooms) { ... }
@@ -58,11 +58,6 @@ In scalar context, returns the number of devices.
 
 Disconnects gracefully. No methods involving communication with the Cube should
 be called after disconnecting.
-
-=head3 init
-
-Handles the incoming data immediately after connecting. As such, it must
-be called immediately after connecting.
 
 =head3 forget($dev)
 

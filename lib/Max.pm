@@ -45,6 +45,8 @@ sub connect {
         PeerHost => $host, PeerPort => $port
     ) or die "Connect: $@";
 
+    $self->_init;
+
     return $self;
 }
 
@@ -197,7 +199,7 @@ sub _readline {
     return $self->{sock}->getline;
 }
 
-sub init {
+sub _init {
     my ($self) = @_;
 
     $self->{devices} = {};
