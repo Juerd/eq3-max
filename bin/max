@@ -206,8 +206,10 @@ sub do_config {
 
 $| = 1;
 
+@ARGV = ('summary') if not @ARGV;
+
 while (@ARGV) {
-    my $command = shift || 'summary';
+    my $command = shift;
     my $sub = $::{"do_$command"} or die "Unknown subcommand '$command'.\n";
 
     if (not $host) {
