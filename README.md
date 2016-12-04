@@ -164,6 +164,13 @@ This will run either `enable-my-boiler` or `disable-my-boiler`.
 
 For a dry-run test, use `max switch echo`.
 
+# Reference documentation
+
+- [executable `max`](bin/max.pod)
+- [Perl class `Max`](lib/Max.pod)
+- [Perl class `Max::Device`](lib/Max/Device.pod)
+- [Perl class `Max::Room`](lib/Max/Room.pod)
+
 # Does it work?
 
 Please let me know. :-)
