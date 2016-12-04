@@ -1,11 +1,12 @@
 #!/usr/bin/perl -w
 use strict;
-use List::Util qw(sum max);
+use List::Util qw(sum max first);
 use FindBin qw($RealBin);
 use lib "$RealBin/../lib";
 use Max;
 
 my $host = $ENV{MAX_HOST};
+my $max;
 
 sub _valid_uint8 {
     my ($id) = @_;
@@ -33,7 +34,7 @@ sub do_pair {
     my $usage = "Usage: $0 pair <roomid>\n";
     _valid_uint8($room) && $room > 0 or die $usage;
 
-    my $max = Max->connect($host)->init;
+    $max ||= Max->connect($host)->init;
     print "Press and hold OK/Boost on the new device...\n";
     my $device = $max->pair();
     print "Pairing done; setting room ID...\n";
@@ -47,7 +48,7 @@ sub do_forget {
     my $usage = "Usage: $0 forget <addr>\n";
     ($addr) = (lc $addr // "") =~ /^([0-9A-Fa-f]{6})$/ or die $usage;
 
-    my $max = Max->connect($host)->init;
+    $max ||= Max->connect($host)->init;
     $max->forget($addr);
     print "Done.\n";
 }
@@ -58,7 +59,7 @@ sub do_crosslink {
     my $usage = "Usage: $0 crosslink <roomid>\n";
     _valid_uint8($room_id) && $room_id > 0 or die $usage;
 
-    my $max = Max->connect($host)->init;
+    $max ||= Max->connect($host)->init;
     my $room = $max->room($room_id) or die "There is no room $room_id";
     my @devices = grep !$_->is_cube, $room->devices
         or die "No devices in " . $room->display_name;
@@ -84,7 +85,7 @@ sub do_dump {
     $Data::Dumper::Indent   = 1;
     $Data::Dumper::Purity   = 0;
     $Data::Dumper::Maxdepth = 2;
-    my $max = Max->connect($host)->init;
+    $max ||= Max->connect($host)->init;
     print Data::Dumper::Dumper($max->devices);
 }
 
@@ -96,7 +97,7 @@ sub do_set {
     $room_id eq 'all' or _valid_uint8($room_id) && $room_id > 0 or die $usage;
     _valid_temperature($setpoint) or die $usage;
 
-    my $max = Max->connect($host)->init;
+    $max ||= Max->connect($host)->init;
 
     for my $room ($room_id eq 'all' ? $max->rooms : $max->room($room_id)) {
         $room->devices or warn "No devices in " . $room->display_name . ".\n";
@@ -107,7 +108,7 @@ sub do_set {
 }
 
 sub do_summary {
-    my $max = Max->connect($host)->init;
+    $max ||= Max->connect($host)->init;
     for my $room ($max->rooms) {
         my @devices = $room->devices;
         next if @devices == 1 and $devices[0]->is_cube;
@@ -143,7 +144,7 @@ sub do_switch {
     $on  //= 1;
     $off //= 0;
 
-    my $max = Max->connect($host)->init;
+    $max ||= Max->connect($host)->init;
 
     my $switch = grep $_->too_cold, $max->rooms;
     my @valves = map $_->valve, grep $_->has_valve, $max->devices;
@@ -160,7 +161,7 @@ sub do_name {
     $id and defined $name or die "Usage: $0 name <id|room> <name>\n";
     ($name) = $name =~ /^([\x20-\xFF]{0,32})$/ or die "Invalid name.\n";
 
-    my $max = Max->connect($host)->init;
+    $max ||= Max->connect($host)->init;
     if (length($id) == 6) {
         my $device = $max->device($id) or die "No such device $id.\n";
         $device->name($name);
@@ -180,7 +181,7 @@ sub do_config {
     $selector or die $usage;
     $selector =~ s/s$//;  # make singular
 
-    my $max = Max->connect($host)->init;
+    $max ||= Max->connect($host)->init;
     my @devices = grep {
         $selector eq 'all'
         or $_->type eq $selector
@@ -205,13 +206,22 @@ sub do_config {
 
 $| = 1;
 
-my $command = shift || 'summary';
-my $sub = $::{"do_$command"} or die "Unknown subcommand '$command'.\n";
+while (@ARGV) {
+    my $command = shift || 'summary';
+    my $sub = $::{"do_$command"} or die "Unknown subcommand '$command'.\n";
 
-if (not $host) {
-    $host = Max->discover or die "MAX_HOST is not set, UDP discovery failed.\n";
-    print "Found cube at $host\n";
+    if (not $host) {
+        $host = Max->discover or die "MAX_HOST is not set, UDP discovery failed.\n";
+        print "Found cube at $host\n";
+    }
+
+    my $i = first { $ARGV[$_] eq ';' } 0..$#ARGV;
+    if (defined $i) {
+        $sub->(splice @ARGV, 0, $i);
+        shift;
+    } else {
+        $sub->(@ARGV);
+        exit;
+    }
 }
-
-$sub->(@ARGV);
 
