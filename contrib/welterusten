@@ -1,0 +1,10 @@
+#!/bin/sh
+
+
+#            bedroom     bathroom
+echo 'max set 19 19'             | at 'now + 1 hour'
+echo 'max set 19 18'             | at 'now + 3 hours'
+echo 'max set 19 20 \; set 2 21' | at 'now + 7 hours'
+echo 'max set 19 15'             | at 'now + 8 hours'
+echo 'max set              2 15' | at 'now + 9 hours'
+
