@@ -107,7 +107,7 @@ sub do_set {
     print "Done.\n";
 }
 
-sub do_summary {
+sub do_status {
     $max ||= Max->connect($host);
     for my $room ($max->rooms) {
         my @devices = $room->devices;
@@ -134,6 +134,23 @@ sub do_summary {
                 uc $device->flags_as_string,
             );
         }
+    }
+}
+
+sub do_summary {
+    $max ||= Max->connect($host);
+    for my $room ($max->rooms) {
+        my @devices = $room->devices;
+        next if @devices == 1 and $devices[0]->is_cube;
+
+        my @valves = map sprintf("%3d%%", $_->valve),
+            grep $_->has_valve, @devices;
+
+        printf "* %-25s %4.1f -> %4.1f %s\n",
+            $room->display_name(1),
+            $room->temperature,
+            $room->setpoint,
+            "@valves";
     }
 }
 
