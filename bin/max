@@ -162,10 +162,7 @@ sub do_switch {
     $off //= 0;
 
     $max ||= Max->connect($host);
-
-    my $switch = grep $_->too_cold, $max->rooms;
-    my @valves = map $_->valve, grep $_->has_valve, $max->devices;
-    $switch = 0 unless sum(@valves) > 60 or max(@valves) > 50;
+    my $switch = $max->heat_demand;
 
     $command = sprintf $command, $switch ? $on : $off;
     print "Executing: $command\n";

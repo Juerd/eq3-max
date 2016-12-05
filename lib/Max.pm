@@ -5,6 +5,7 @@ use IO::Socket::INET;
 use IO::Select;
 use Carp qw(croak carp);
 use MIME::Base64 qw(decode_base64 encode_base64);
+use List::Util ();
 use Max::Room;
 use Max::Device;
 
@@ -304,6 +305,17 @@ sub write_metadata {
         $self->_send(sprintf "m:%02x,%s", $i, $blocks[$i]);
         $self->_waitfor("A");
     }
+}
+
+sub heat_demand {
+    my ($self) = @_;
+    my $demand = grep $_->too_cold, $self->rooms;
+    my @valves = map $_->valve, grep $_->has_valve, $self->devices;
+
+    $demand = 0 unless List::Util::sum(@valves) > 60
+        or List::Util::max(@valves) > 50;
+
+    return !!$demand;
 }
 
 1;
