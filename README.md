@@ -1,27 +1,51 @@
 # Yet another
 
-Because other implementations were part of larger systems, didn't compile, or
-were incomplete to the point of being useless, eventually I decided to roll my
-own. And of course, my version is incomplete too. But it's a stand-alone script
-that does not depend on an entire home automation platform.
+In general, reinventing the wheel seems like a waste of time. But I decided to
+roll my own anyway. The official software is closed source, requires an account,
+and only runs on Microsoft Windows. Most open source Max! projects are very
+incomplete, but all the feature complete solutions are part of complicated home
+automation systems (FHEM, openHAB, Node-RED). And because I never used the
+original software, I needed something that will even work if you begin with a
+new, unconfigured Cube.
 
-I've never used the official Windows or Mac software on my Cube, and as such
-had to find out how to use the protocol on a new, unconfigured Cube. No portal,
-no cloud! Just control the entire device from a single command line utility.
+Of course, my program is incomplete too. It does exactly what I need, but not
+much more.
 
-# Disclaimer
+# Reference documentation
 
-THIS SOFTWARE MAY OR MAY NOT WORK FOR YOUR USE CASE. IT WAS WRITTEN FOR MY
-SPECIFIC SITUATION. DON'T COMPLAIN IF IT BURNS DOWN YOUR HOUSE...
+- [executable `max`](bin/max.pod)
+- [Perl class `Max`](lib/Max.pod)
+- [Perl class `Max::Device`](lib/Max/Device.pod)
+- [Perl class `Max::Room`](lib/Max/Room.pod)
 
-I had to make a lot of assumptions. For example, I'll assume that all the
-devices in a room should be linked together. But I only have at most 1 wall
-thermostat and 1 TRV per room, so with multiple TRVs I don't know if my
-assumption is correct. And I have no idea how the Eco button works, or whether
-the program will work with other "eQ-3 Max!" devices that I don't own.
+# Features
 
-Patches welcome, though! :-)
-Please add detailed info about why the change was needed.
+Ease of use:
+
+* No "portal" account or any other cloud service needed.
+* Works on new Max! Cubes out of the box.
+* Works on most Linux systems without installing additional software.
+* No configuration is needed, it can find the Cube automatically.
+* All features can be used on the command line (beginner friendly).
+* All features can be used via the Perl module (for advanced users).
+
+Supported actions:
+
+* Pairing new devices, assigning room IDs.
+* Assigning names to rooms and devices.
+* Cross-linking devices within a room.
+* Setting (overriding) the temperature in a room.
+* Switching a boiler on/off via an external program.
+* Text based short or detailed status overview.
+
+Contrib scripts included:
+
+* _max2graphite_ will dump room statistics to a Graphite server running on
+  localhost.
+* _set-gpio_ can be used to drive a GPIO pin (e.g. on a Raspberry Pi) to
+  switch a boiler via a relay.
+* _welterusten_ (Dutch for "good night!") is an example of scheduling with
+  `at`, as an alternative to fixed time schedules.
 
 # Installing
 
@@ -164,14 +188,25 @@ This will run either `enable-my-boiler` or `disable-my-boiler`.
 
 For a dry-run test, use `max switch echo`.
 
-# Reference documentation
+# Disclaimer
 
-- [executable `max`](bin/max.pod)
-- [Perl class `Max`](lib/Max.pod)
-- [Perl class `Max::Device`](lib/Max/Device.pod)
-- [Perl class `Max::Room`](lib/Max/Room.pod)
+THIS SOFTWARE MAY OR MAY NOT WORK FOR YOUR USE CASE. IT WAS WRITTEN FOR MY
+SPECIFIC SITUATION, BUT I HOPE IT'S USEFUL FOR YOURS. JUST DON'T COMPLAIN IF IT
+BURNS DOWN YOUR HOUSE...
+
+Because I don't have all the different devices in the eQ-3 Max! range, and the
+vendor does not provide any official documentation, this software is based on a
+lot of assumptions.
+
+If you know Perl and have the Max! window switches or an "eco button", please
+contribute patches.
 
 # Does it work?
 
-Please let me know. :-)
+Please let me know. I'd love to receive a screenshot or copy/paste of `max
+status` on your system.
+
+# See also
+
+* [eQ-3 Max! protocol documentation](https://github.com/Bouni/max-cube-protocol)
 
