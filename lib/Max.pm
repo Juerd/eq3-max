@@ -137,8 +137,8 @@ sub _process_L {
                 invalid => !  $flags & 0x1000,
             },
             mode        => $flags & 0x0003,
-            setpoint    => sprintf("%.1f", $setpoint / 2),
-            temperature => sprintf("%.1f", $temp / 10),
+            setpoint    => $setpoint / 2,
+            temperature => $temp / 10,
             valve       => $valve,
         );
     }

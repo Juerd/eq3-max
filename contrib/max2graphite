@@ -12,9 +12,15 @@ my $max = Max->connect(Max->discover);
 
 for my $room ($max->rooms) {
     my $name = $room->name || $room->id;
+
+    my $t = $room->temperature;
+    $graphite->send(path => "max.$name.temperature", value => $t) if $t;
+
+    my $s = $room->setpoint;
+    $graphite->send(path => "max.$name.setpoint", value => $s) if $s;
+
     my $valves = sum map $_->valve, grep $_->has_valve, $room->devices;
-    $graphite->send(path => "max.$name.temperature", value => $room->temperature);
-    $graphite->send(path => "max.$name.setpoint", value => $room->setpoint);
     $graphite->send(path => "max.$name.valves", value => $valves);
 }
+
 $graphite->send(path => "max.boiler", value => 0 + $max->heat_demand);
