@@ -9,9 +9,10 @@ use List::Util ();
 use Max::Room;
 use Max::Device;
 
-sub discover {
-    my ($class) = @_;
-    ref $class and croak "Class method called on instance";
+sub _send_udp {
+    my ($opcode, $host, $serial) = @_;
+    $host ||= '255.255.255.255';  # broadcast
+    $serial ||= '**********';     # matches any serial number
 
     my $send = IO::Socket::INET->new(
         PeerAddr => "255.255.255.255",
@@ -20,7 +21,15 @@ sub discover {
         Broadcast => 1,
         Reuse => 1,
     ) or die "Can't open broadcast socket ($!)";
-    $send->send("eQ3Max*\0**********I") or die $!;
+
+    $send->send("eQ3Max*\0$serial$opcode") or die $!;
+}
+
+sub discover {
+    my ($class) = @_;
+    ref $class and croak "Class method called on instance";
+
+    _send_udp("I");
 
     my $receive = IO::Socket::INET->new(
         LocalAddr => "0.0.0.0",
@@ -40,7 +49,7 @@ sub discover {
 sub connect {
     my ($class, $host, $port) = @_;
     $port ||= 62910;
-    my $self = bless {}, $class;
+    my $self = bless { host => $host }, $class;
 
     $self->{sock} = IO::Socket::INET->new(
         PeerHost => $host, PeerPort => $port
@@ -63,6 +72,16 @@ sub _waitfor {
     }
     carp "No response";
     return undef;
+}
+
+sub _process_H {
+    my ($self, $data) = @_;
+
+    ($self->{serial}, $self->{addr}, $self->{firmware}) = split /,/, $data;
+
+    # There's more in this header, but it's not very interesting:
+    # unknown, "HTTP connection id", duty cycle, free memory slots,
+    # date, time, state time, ntp counter.
 }
 
 sub _process_C {
@@ -206,17 +225,11 @@ sub _init {
     $self->{devices} = {};
     $self->{rooms}   = {};
 
-    LINE: while (my $line = $self->_readline) {
-        if ($line =~ /^M:(.*)/) {
-            $self->_process_M($1);
-        }
-        if ($line =~ /^C:(.*)/) {
-            $self->_process_C($1);
-        }
-        if ($line =~ /^L:(.*)/) {
-            $self->_process_L($1);
-            last LINE;
-        }
+    while (my $line = $self->_readline) {
+        $self->_process_H($1)       if $line =~ /^H:(.*)/;
+        $self->_process_M($1)       if $line =~ /^M:(.*)/;
+        $self->_process_C($1)       if $line =~ /^C:(.*)/;
+        $self->_process_L($1), last if $line =~ /^L:(.*)/;
     }
 
     for my $device ($self->devices) {
@@ -316,6 +329,11 @@ sub heat_demand {
         or List::Util::max(@valves) > 50;
 
     return !!$demand;
+}
+
+sub reboot {
+    my ($self) = @_;
+    _send_udp("R", $self->{host}, $self->{serial});
 }
 
 1;

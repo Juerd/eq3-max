@@ -218,6 +218,12 @@ sub do_config {
     die "Unknown parameter: $param";
 }
 
+sub do_reboot {
+    $max ||= Max->connect($host);
+
+    $max->reboot;
+}
+
 $| = 1;
 
 @ARGV = ('summary') if not @ARGV;

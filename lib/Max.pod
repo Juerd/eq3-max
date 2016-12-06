@@ -70,6 +70,11 @@ so even after forget(), it will still be listed.
 Initiates device pairing on the Cube. If successful, returns a Max::Device
 object that represents the newly paired device. Dies on recognised errors.
 
+=head3 reboot
+
+Sends a UDP command to immediately reboot the Cube. After this, the object
+should not be reused because the TCP connection will have died.
+
 =head3 room($id)
 
 Returns the Max::Room object for the given room ID. Creates a new object (but
