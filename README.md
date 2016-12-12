@@ -109,7 +109,7 @@ your neighbours :)
 3. See if the devices show up in the overview:
 
   ```
-    max
+    max status
 ```
 
 4. If you added multiple devices, set up links between the devices in the
@@ -128,7 +128,7 @@ room:
 6. See if the devices report the new setpoint:
 
   ```
-    max
+    max status
     # It may take a while before devices synchronise
 ```
 
