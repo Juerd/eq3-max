@@ -129,11 +129,11 @@ sub _process_L {
             or warn "Unexpected device " . unpack("H*", $addr);
 
         $device->_set(flags => {
-            init    => !! ($flags & 0x0020),
-            link    => !! ($flags & 0x0040),
-            battery => !! ($flags & 0x0080),
-            error   => !! ($flags & 0x0800),
-            invalid => !  ($flags & 0x1000),
+            link_error    => !! ($flags & 0x0040),
+            battery       => !! ($flags & 0x0080),
+            uninitialized => !  ($flags & 0x0200),
+            error         => !! ($flags & 0x0800),
+            invalid       => !  ($flags & 0x1000),
         });
 
         $device->_set(
