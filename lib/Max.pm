@@ -314,7 +314,7 @@ sub write_metadata {
             map(pack(
                 "C a3 a10 C/a C",
                 $_->type_num, $_->addr, $_->serial//"", $_->name//"",
-                $_->room->id
+                ($_->room ? $_->room->id : 0)
             ), @devices)
         ),
         ""
