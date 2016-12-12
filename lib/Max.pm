@@ -52,7 +52,7 @@ sub connect {
     my $self = bless { host => $host }, $class;
 
     $self->{sock} = IO::Socket::INET->new(
-        PeerHost => $host, PeerPort => $port
+        PeerHost => $host, PeerPort => $port, Timeout => 5
     ) or die "Connect: $@";
 
     $self->_init;
@@ -266,6 +266,12 @@ sub disconnect {
     my ($self) = @_;
     $self->_send("q:");
     $self->{sock}->close;
+}
+
+sub DESTROY {
+    my ($self) = @_;
+    $self->{sock} or return;
+    $self->disconnect;
 }
 
 sub devices {
