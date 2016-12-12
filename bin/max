@@ -121,6 +121,9 @@ sub do_status {
         for my $device (@devices) {
             next if $device->is_cube;
 
+            my $setpoint = $device->mode . '@' . $device->setpoint . ' '
+                if $device->has_setpoint;
+
             my $extra = 
                 $device->has_temperature
                 ? sprintf("(current %.1f) ", $device->temperature)
@@ -129,10 +132,9 @@ sub do_status {
                 : "";
 
             printf(
-                "    %-${width}s %s\@%.1f %s%s\n",
+                "    %-${width}s %s%s%s\n",
                 $device->display_name(1),
-                $device->mode,
-                $device->setpoint,
+                $setpoint,
                 $extra,
                 uc $device->flags_as_string,
             );

@@ -64,9 +64,10 @@ sub flags_as_string {
     return join " ", grep $self->{flags}{$_}, sort keys %{ shift->{flags} };
 }
 
-sub has_temperature { shift->{type} == 3 }
+sub is_cube         { $_[0]->{type} == 0 }
 sub has_valve       { $_[0]->{type} == 1 or $_[0]->{type} == 2 }
-sub is_cube         { shift->{type} == 0 }
+sub has_temperature { $_[0]->{type} == 3 }
+sub has_setpoint    { $_[0]->{type} >= 1 and $_[0]->{type} <= 3 }
 
 sub room {
     my ($self, $new) = @_;
