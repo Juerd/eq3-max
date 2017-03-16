@@ -85,6 +85,8 @@ sub too_cold {
     my ($self, $maxdelta) = @_;
     $maxdelta ||= 0;
 
+    return 1 if grep $_->mode eq 'boost', $self->devices;
+
     my $temperature = $self->temperature or return undef;
     my $setpoint = $self->setpoint or return undef;
 
