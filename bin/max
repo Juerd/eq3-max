@@ -156,8 +156,8 @@ sub do_summary {
 
         printf "* %-${width}s %4.1f -> %4.1f %s\n",
             $room->display_name(1),
-            $room->temperature,
-            $room->setpoint,
+            $room->temperature // 0,
+            $room->setpoint // 0,
             "@valves";
     }
 }
