@@ -77,9 +77,9 @@ sub setpoint {
     my $t2 = $new * 2;
     ($t2 == int $t2) or croak "Temperature not a multiple of 0.5";
     $t2 > 0 or $t2 < 256 or croak "Invalid temperature ($new)";
-    #Set Mode 00=auto, 01=manual, 10=vacation, 11=boost
+    # Set Mode 00=auto, 01=manual, 10=vacation, 11=boost
     my $tempmode = sprintf("00");
-    #Calc Temperature
+    # Calc Temperature
     my $tempbin = sprintf("%b",$t2);
     # Combine Mode & Temperature to hex
     my $tempsendhex = sprintf('%x', oct("0b$tempmode$tempbin"));
