@@ -93,7 +93,7 @@ sub do_set {
     my ($room_id, $setpoint) = @_;
     $room_id ||= 0;
 
-    my $usage = "Usage: $0 manual <roomid> <temperature per 0.5>\n";
+    my $usage = "Usage: $0 set <roomid> <temperature per 0.5>\n";
     $room_id eq 'all' or _valid_uint8($room_id) && $room_id > 0 or die $usage;
     _valid_temperature($setpoint) or die $usage;
 
