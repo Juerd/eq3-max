@@ -4,6 +4,8 @@ package Max::Room;
 use Carp qw(croak carp);
 use MIME::Base64 qw(decode_base64 encode_base64);
 
+my $defmode = "00";
+
 sub new {
     my ($class, %p) = @_;
     $p{devices} ||= {};
@@ -78,7 +80,7 @@ sub setpoint {
     ($t2 == int $t2) or croak "Temperature not a multiple of 0.5";
     $t2 > 0 or $t2 < 256 or croak "Invalid temperature ($new)";
     # Set Mode 00=auto, 01=manual, 10=vacation, 11=boost
-    my $tempmode = sprintf("00");
+    my $tempmode = $defmode;
     # Calc Temperature
     my $tempbin = sprintf("%b",$t2);
     # Combine Mode & Temperature to hex
