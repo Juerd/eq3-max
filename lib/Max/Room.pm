@@ -82,9 +82,9 @@ sub setpoint {
     # Set Mode 00=auto, 01=manual, 10=vacation, 11=boost
     my $tempmode = $defmode;
     # Calc Temperature
-    my $tempbin = sprintf("%b",$t2);
+    my $tempbin = sprintf("%06b",$t2);
     # Combine Mode & Temperature to hex
-    my $tempsendhex = sprintf('%x', oct("0b$tempmode$tempbin"));
+    my $tempsendhex = sprintf('%02x', oct("0b$tempmode$tempbin"));
     # Send combined hex 
     return $self->_send_radio(0x40, $tempsendhex);
 }
