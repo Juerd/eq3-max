@@ -4,7 +4,14 @@ package Max::Room;
 use Carp qw(croak carp);
 use MIME::Base64 qw(decode_base64 encode_base64);
 
-my $defmode = "00";
+my $defmode;
+$defmode = $ENV{MAX_DEFMODE};
+if(!defined $defmode || length($defmode) == 0)
+{
+    # MAX_DEFMODE is unset so hardcode value
+    # Set Mode 00=auto, 01=manual, 10=vacation, 11=boost
+    $defmode = "00";
+}
 
 sub new {
     my ($class, %p) = @_;
