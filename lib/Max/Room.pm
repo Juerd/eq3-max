@@ -94,6 +94,18 @@ sub setpoint {
     } else {
     $tempmode = $setmode;
     }
+    if ( $setmode eq '00' || lc($setmode) eq 'auto' ) {
+    	$tempmode = '00';
+    } elsif ( $setmode eq '01' || lc($setmode) eq 'manual' || lc($setmode) eq 'party' ) {
+    	$tempmode = '01';
+    } elsif ( $setmode eq '10' || lc($setmode) eq 'vacation' ) {
+    	$tempmode = '10';
+    } elsif ( $setmode eq '11' || lc($setmode) eq 'boost' ) {
+    	$tempmode = '11';
+    } else {
+        $tempmode = $defmode;
+    }
+
 
     # Calc Temperature
     my $tempbin = sprintf("%06b",$t2);
