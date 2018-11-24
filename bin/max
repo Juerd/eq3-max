@@ -90,10 +90,10 @@ sub do_dump {
 }
 
 sub do_set {
-    my ($room_id, $setpoint) = @_;
+    my ($room_id, $setpoint, $setmode) = @_;
     $room_id ||= 0;
 
-    my $usage = "Usage: $0 set <roomid> <temperature per 0.5>\n";
+    my $usage = "Usage: $0 set <roomid> <temperature per 0.5> <xx (optional mode 00=auto, 01=manual, 10=vacation, 11=boost)>\n";
     $room_id eq 'all' or _valid_uint8($room_id) && $room_id > 0 or die $usage;
     _valid_temperature($setpoint) or die $usage;
 
@@ -102,7 +102,7 @@ sub do_set {
     for my $room ($room_id eq 'all' ? $max->rooms : $max->room($room_id)) {
         $room->devices or warn "No devices in " . $room->display_name . ".\n";
         printf "Setting %s temperature to %s.\n", $room->display_name, $setpoint;
-        $room->setpoint($setpoint) or die "Setting temperature failed.\n";
+        $room->setpoint($setpoint, $setmode) or die "Setting temperature failed.\n";
     }
     print "Done.\n";
 }

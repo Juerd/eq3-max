@@ -79,7 +79,7 @@ sub _get_setpoint {
 }
 
 sub setpoint {
-    my ($self, $new) = @_;
+    my ($self, $new, $setmode) = @_;
 
     return $self->_get_setpoint if not defined $new;
 
@@ -87,7 +87,14 @@ sub setpoint {
     ($t2 == int $t2) or croak "Temperature not a multiple of 0.5";
     $t2 > 0 or $t2 < 256 or croak "Invalid temperature ($new)";
     # Set Mode 00=auto, 01=manual, 10=vacation, 11=boost
-    my $tempmode = $defmode;
+    my $tempmode;
+    if(!defined $setmode || length($setmode) == 0)
+    {
+    $tempmode = $defmode;
+    } else {
+    $tempmode = $setmode;
+    }
+
     # Calc Temperature
     my $tempbin = sprintf("%06b",$t2);
     # Combine Mode & Temperature to hex
