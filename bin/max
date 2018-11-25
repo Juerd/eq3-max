@@ -122,24 +122,37 @@ sub do_status {
             next if $device->is_cube;
             #next if $device->is_button;
             #next if $device->is_shutter;
-
-            my $setpoint = sprintf "%s@%.1f ", $device->mode, $device->setpoint
-                if $device->has_setpoint;
-
+            if ( $device->is_shutter ) {
             my $extra = 
-                $device->has_temperature
-                ? sprintf("(current %.1f) ", $device->temperature)
-                : $device->has_valve
-                ? sprintf("(valve at %d%%) ", $device->valve)
-                : "";
+                sprintf("value is %d", $device->mode_num);
 
             printf(
-                "    %-${width}s %s%s%s\n",
+                "    %-${width}s %s\n",
                 $device->display_name(1),
-                $setpoint,
                 $extra,
                 uc $device->flags_as_string,
             );
+            }
+
+            if ( $device->has_setpoint ) {
+                my $setpoint = sprintf "%s@%.1f ", $device->mode, $device->setpoint
+                    if $device->has_setpoint;
+
+                my $extra = 
+                    $device->has_temperature
+                    ? sprintf("(current %.1f) ", $device->temperature)
+                    : $device->has_valve
+                    ? sprintf("(valve at %d%%) ", $device->valve)
+                    : "";
+
+                printf(
+                    "    %-${width}s %s%s%s\n",
+                    $device->display_name(1),
+                    $setpoint,
+                    $extra,
+                    uc $device->flags_as_string,
+                );
+            }
         }
     }
 }
