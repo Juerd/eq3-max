@@ -120,19 +120,27 @@ sub do_status {
 
         for my $device (@devices) {
             next if $device->is_cube;
-            #next if $device->is_button;
+            next if $device->is_button;
             #next if $device->is_shutter;
-            if ( $device->is_shutter ) {
-            my $extra = 
-                sprintf("value is %d", $device->mode_num);
 
+            if ( $device->is_shutter ) {
+            my $extra;
+            if ( $device->mode_num == 0 ) {
+                    $extra = "closed   ";
+            } elsif ( $device->mode_num == 2 ) {
+                    $extra = "open     ";        
+            } else {
+                    $extra = "unknown value";
+            }
+            $extra = $extra . sprintf("(value is %d)", $device->mode_num);
             printf(
-                "    %-${width}s %s\n",
+                "    %-${width}s %s%s\n",
                 $device->display_name(1),
                 $extra,
                 uc $device->flags_as_string,
             );
             }
+
 
             if ( $device->has_setpoint ) {
                 my $setpoint = sprintf "%s@%.1f ", $device->mode, $device->setpoint
