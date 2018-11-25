@@ -120,6 +120,8 @@ sub do_status {
 
         for my $device (@devices) {
             next if $device->is_cube;
+            #next if $device->is_button;
+            #next if $device->is_shutter;
 
             my $setpoint = sprintf "%s@%.1f ", $device->mode, $device->setpoint
                 if $device->has_setpoint;

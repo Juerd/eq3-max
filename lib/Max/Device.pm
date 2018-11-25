@@ -68,6 +68,8 @@ sub is_cube         { $_[0]->{type} == 0 }
 sub has_valve       { $_[0]->{type} == 1 or $_[0]->{type} == 2 }
 sub has_temperature { $_[0]->{type} == 3 }
 sub has_setpoint    { $_[0]->{type} >= 1 and $_[0]->{type} <= 3 }
+sub is_shutter      { $_[0]->{type} == 4 }
+sub is_button       { $_[0]->{type} == 5 }
 
 sub room {
     my ($self, $new) = @_;
