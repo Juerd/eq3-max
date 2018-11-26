@@ -100,6 +100,8 @@ sub do_set {
     $max ||= Max->connect($host);
 
     for my $room ($room_id eq 'all' ? $max->rooms : $max->room($room_id)) {
+        my @devices = $room->devices;
+        next if @devices == 1 and $devices[0]->is_cube;
         $room->devices or warn "No devices in " . $room->display_name . ".\n";
         printf "Setting %s temperature to %s.\n", $room->display_name, $setpoint;
         $room->setpoint($setpoint, $setmode) or die "Setting temperature failed.\n";
@@ -140,7 +142,6 @@ sub do_status {
                 uc $device->flags_as_string,
             );
             }
-
 
             if ( $device->has_setpoint ) {
                 my $setpoint = sprintf "%s@%.1f ", $device->mode, $device->setpoint
