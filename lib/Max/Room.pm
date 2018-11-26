@@ -90,10 +90,8 @@ sub setpoint {
     my $tempmode;
     if(!defined $setmode || length($setmode) == 0)
     {
-    $tempmode = $defmode;
-    } else {
-    $tempmode = $setmode;
-    }
+    $setmode = $defmode;
+    } 
     if ( $setmode eq '00' || lc($setmode) =~ m/^aut/ ) {
         $tempmode = '00';
     } elsif ( $setmode eq '01' || lc($setmode) =~ m/^man/ || lc($setmode) =~ m/^par/ ) {
