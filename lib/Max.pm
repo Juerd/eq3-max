@@ -122,7 +122,7 @@ sub _process_L {
         my ($addr, undef, $flags, $valve, $setpoint, $date, $time, $temp)
             = unpack "a3 C n C C n C C", $devicedata;
         # button & shutter cause following output at next lines
-        # Use of uninitialized value $setpoint in bitwise and (&) at /../lib/Max.pm line 129, <GEN0> line 8.
+        # Use of uninitialized value $setpoint in bitwise and (&) at /../lib/Max.pm line 126, <GEN0> line 8.
         $temp |= !!($setpoint & 0x80) << 8;
         $setpoint &= 0x7F;
 

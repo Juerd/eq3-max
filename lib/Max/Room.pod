@@ -61,8 +61,9 @@ Returns undef if the setting is not known.
 
 =head3 setpoint($temperature)
 
-Sends a new B<manual> setpoint temperature to all the devices in the room. The
-new temperature must be a multiple of 0.5.
+Sends a new B<mode> setpoint temperature to all the devices in the room. The
+new temperature must be a multiple of 0.5. 
+The B<mode> can be set to 00=auto, 01=manual, 10=vacation, 11=boost. 
 
 Currently does not handle errors.
 
@@ -83,8 +84,8 @@ temperature or setpoint is not known.
 
 =item * Very little parameter checking is done.
 
-=item * Because C<set_temperature> sets the mode to "manual", the setting is
-kept. The suggested use of this library is to set programs on a computer (via
+=item * If the C<set_temperature> sets the mode to "manual", the setting is
+kept. The suggested use of this library is then to set programs on a computer (via
 cron) rather than directly on the devices.
 
 =back

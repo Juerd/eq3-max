@@ -151,7 +151,7 @@ Note: not all devices have a valve. Use C<has_valve> to test this.
 
 =over
 
-=item * Shutter and button devices are not (yet) supported.
+=item * Shutter and button devices are not (yet) really supported.
 
 =item * Tricks exist to read the current measured temperature from a TRV, but
 because that involves waiting for parameters to change, this library does not
