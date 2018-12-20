@@ -46,6 +46,14 @@ Specify C<all> instead of a numeric room ID to set the temperature everywhere.
 
 Outputs a summary of device attributes, grouped by room.
 
+=head3 status
+
+Outputs some helpful device attributes for all devices except button and cube. 
+
+=head3 batstatus
+
+Outputs the battery status per devices, grouped by room.
+
 =head3 switch <command> [<on> <off>]
 
 Determines whether there is a demand for heat, and runs the given shell command
