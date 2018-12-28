@@ -148,8 +148,8 @@ if (  defined $temp ) {
 print "temp-SET-1--~$temp~\n";
 }
 
-        $temp |= !!($setpoint & 0x80) << 8;
-        $setpoint &= 0x7F;
+#        $temp |= !!($setpoint & 0x80) << 8;
+#        $setpoint &= 0x7F;
 
 if (  defined $addr ) {
 print "addr-SET-2--~$addr~\n";
@@ -186,12 +186,28 @@ print "temp-SET-2--~$temp~\n";
             invalid       => !  ($flags & 0x1000),
         });
 
-        $device->_set(
-            mode        => $flags & 0x0003,
-            setpoint    => $setpoint / 2,
-            temperature => $temp / 10,
-            valve       => $valve,
-        ) if defined $setpoint;  # not for button/shutter
+if ((  defined $valve ) && ( defined $setpoint )) {
+    $temp |= !!($setpoint & 0x80) << 8;
+    $setpoint &= 0x7F;
+    print "##################### VALVE and SETPOINT\n";
+    $device->_set(
+        mode        => $flags & 0x0003,
+        setpoint    => $setpoint / 2,
+        temperature => $temp / 10,
+        valve       => $valve,
+    )
+} else {
+    print "##################### JUST MODE\n";
+    $device->_set(
+        mode        => $flags & 0x0003,
+    )
+}
+#        $device->_set(
+#            mode        => $flags & 0x0003,
+#            setpoint    => $setpoint / 2,
+#            temperature => $temp / 10,
+#            valve       => $valve,
+#        ) if defined $setpoint;  # not for button/shutter
     }
 }
 
