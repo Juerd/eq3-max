@@ -123,58 +123,58 @@ sub _process_L {
             = unpack "a3 C n C C n C C", $devicedata;
         # button & shutter cause following output at next lines
         # Use of uninitialized value $setpoint in bitwise and (&) at /../lib/Max.pm line 126, <GEN0> line 8.
-        if (  defined $addr ) {
-print "addr-SET-1--~$addr~\n";
-}
-if (  defined $loff4unknown ) {
-print "loff4unknown-SET-1--~$loff4unknown~\n";
-}
-if (  defined $flags ) {
-print "flags-SET-1--~$flags~\n";
-}
-if (  defined $valve ) {
-print "valve-SET-1--~$valve~\n";
-}
-if (  defined $setpoint ) {
-print "setpoint-SET-1--~$setpoint~\n";
-}
-if (  defined $date ) {
-print "date-SET-1--~$date~\n";
-}
-if (  defined $time ) {
-print "time-SET-1--~$time~\n";
-}
-if (  defined $temp ) {
-print "temp-SET-1--~$temp~\n";
-}
+#if (  defined $addr ) {
+#print "addr-SET-1--~$addr~\n";
+#}
+#if (  defined $loff4unknown ) {
+#print "loff4unknown-SET-1--~$loff4unknown~\n";
+#}
+#if (  defined $flags ) {
+#print "flags-SET-1--~$flags~\n";
+#}
+#if (  defined $valve ) {
+#print "valve-SET-1--~$valve~\n";
+#}
+#if (  defined $setpoint ) {
+#print "setpoint-SET-1--~$setpoint~\n";
+#}
+#if (  defined $date ) {
+#print "date-SET-1--~$date~\n";
+#}
+#if (  defined $time ) {
+#print "time-SET-1--~$time~\n";
+#}
+#if (  defined $temp ) {
+#print "temp-SET-1--~$temp~\n";
+#}
 
 #        $temp |= !!($setpoint & 0x80) << 8;
 #        $setpoint &= 0x7F;
 
-if (  defined $addr ) {
-print "addr-SET-2--~$addr~\n";
-}
-if (  defined $loff4unknown ) {
-print "loff4unknown-SET-2--~$loff4unknown~\n";
-}
-if (  defined $flags ) {
-print "flags-SET-2--~$flags~\n";
-}
-if (  defined $valve ) {
-print "valve-SET-2--~$valve~\n";
-}
-if (  defined $setpoint ) {
-print "setpoint-SET-2--~$setpoint~\n";
-}
-if (  defined $date ) {
-print "date-SET-2--~$date~\n";
-}
-if (  defined $time ) {
-print "time-SET-2--~$time~\n";
-}
-if (  defined $temp ) {
-print "temp-SET-2--~$temp~\n";
-}
+#if (  defined $addr ) {
+#print "addr-SET-2--~$addr~\n";
+#}
+#if (  defined $loff4unknown ) {
+#print "loff4unknown-SET-2--~$loff4unknown~\n";
+#}
+#if (  defined $flags ) {
+#print "flags-SET-2--~$flags~\n";
+#}
+#if (  defined $valve ) {
+#print "valve-SET-2--~$valve~\n";
+#}
+#if (  defined $setpoint ) {
+#print "setpoint-SET-2--~$setpoint~\n";
+#}
+#if (  defined $date ) {
+#print "date-SET-2--~$date~\n";
+#}
+#if (  defined $time ) {
+#print "time-SET-2--~$time~\n";
+#}
+#if (  defined $temp ) {
+#print "temp-SET-2--~$temp~\n";
+#}
         my $device = $self->{devices}{$addr}
             or warn "Unexpected device " . unpack("H*", $addr);
 
@@ -186,22 +186,22 @@ print "temp-SET-2--~$temp~\n";
             invalid       => !  ($flags & 0x1000),
         });
 
-if ((  defined $valve ) && ( defined $setpoint )) {
-    $temp |= !!($setpoint & 0x80) << 8;
-    $setpoint &= 0x7F;
-    print "##################### VALVE and SETPOINT\n";
-    $device->_set(
-        mode        => $flags & 0x0003,
-        setpoint    => $setpoint / 2,
-        temperature => $temp / 10,
-        valve       => $valve,
-    )
-} else {
-    print "##################### JUST MODE\n";
-    $device->_set(
-        mode        => $flags & 0x0003,
-    )
-}
+        if ((  defined $valve ) && ( defined $setpoint )) {
+            $temp |= !!($setpoint & 0x80) << 8;
+            $setpoint &= 0x7F;
+            #print "##################### VALVE and SETPOINT\n";
+            $device->_set(
+                mode        => $flags & 0x0003,
+                setpoint    => $setpoint / 2,
+                temperature => $temp / 10,
+                valve       => $valve,
+            );
+        } else {
+            #print "##################### JUST MODE\n";
+            $device->_set(
+                mode        => $flags & 0x0003,
+            );
+        }
 #        $device->_set(
 #            mode        => $flags & 0x0003,
 #            setpoint    => $setpoint / 2,
