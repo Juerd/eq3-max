@@ -119,13 +119,62 @@ sub _process_L {
     my $data = decode_base64 $base64;
     my @devices = unpack "(C/a)*", $data;
     for my $devicedata (@devices) {
-        my ($addr, undef, $flags, $valve, $setpoint, $date, $time, $temp)
+        my ($addr, $loff4unknown, $flags, $valve, $setpoint, $date, $time, $temp)
             = unpack "a3 C n C C n C C", $devicedata;
         # button & shutter cause following output at next lines
         # Use of uninitialized value $setpoint in bitwise and (&) at /../lib/Max.pm line 126, <GEN0> line 8.
+        if (  defined $addr ) {
+print "addr-SET-1--~$addr~\n";
+}
+if (  defined $loff4unknown ) {
+print "loff4unknown-SET-1--~$loff4unknown~\n";
+}
+if (  defined $flags ) {
+print "flags-SET-1--~$flags~\n";
+}
+if (  defined $valve ) {
+print "valve-SET-1--~$valve~\n";
+}
+if (  defined $setpoint ) {
+print "setpoint-SET-1--~$setpoint~\n";
+}
+if (  defined $date ) {
+print "date-SET-1--~$date~\n";
+}
+if (  defined $time ) {
+print "time-SET-1--~$time~\n";
+}
+if (  defined $temp ) {
+print "temp-SET-1--~$temp~\n";
+}
+
         $temp |= !!($setpoint & 0x80) << 8;
         $setpoint &= 0x7F;
 
+if (  defined $addr ) {
+print "addr-SET-2--~$addr~\n";
+}
+if (  defined $loff4unknown ) {
+print "loff4unknown-SET-2--~$loff4unknown~\n";
+}
+if (  defined $flags ) {
+print "flags-SET-2--~$flags~\n";
+}
+if (  defined $valve ) {
+print "valve-SET-2--~$valve~\n";
+}
+if (  defined $setpoint ) {
+print "setpoint-SET-2--~$setpoint~\n";
+}
+if (  defined $date ) {
+print "date-SET-2--~$date~\n";
+}
+if (  defined $time ) {
+print "time-SET-2--~$time~\n";
+}
+if (  defined $temp ) {
+print "temp-SET-2--~$temp~\n";
+}
         my $device = $self->{devices}{$addr}
             or warn "Unexpected device " . unpack("H*", $addr);
 
