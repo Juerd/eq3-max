@@ -73,7 +73,8 @@ sub _get_setpoint {
 
     for my $device ($self->devices) {
         # TRVs sometimes report setpoint as 0.0
-        return $device->setpoint if $device->setpoint > 0;
+        # return $device->setpoint if $device->setpoint > 0;
+        return $device->setpoint if (( defined $device->setpoint ) && ( $device->setpoint > 0 ));
     }
     return undef;
 }
