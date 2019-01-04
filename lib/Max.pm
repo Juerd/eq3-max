@@ -119,12 +119,8 @@ sub _process_L {
     my $data = decode_base64 $base64;
     my @devices = unpack "(C/a)*", $data;
     for my $devicedata (@devices) {
-        my ($addr, undef, $flags, $valve, $setpoint, $date, $time, $temp)
+        my ($addr, $loff4unknown, $flags, $valve, $setpoint, $date, $time, $temp)
             = unpack "a3 C n C C n C C", $devicedata;
-        # button & shutter cause following output at next lines
-        # Use of uninitialized value $setpoint in bitwise and (&) at /../lib/Max.pm line 126, <GEN0> line 8.
-        $temp |= !!($setpoint & 0x80) << 8;
-        $setpoint &= 0x7F;
 
         my $device = $self->{devices}{$addr}
             or warn "Unexpected device " . unpack("H*", $addr);
@@ -137,12 +133,20 @@ sub _process_L {
             invalid       => !  ($flags & 0x1000),
         });
 
-        $device->_set(
-            mode        => $flags & 0x0003,
-            setpoint    => $setpoint / 2,
-            temperature => $temp / 10,
-            valve       => $valve,
-        ) if defined $setpoint;  # not for button/shutter
+        if ((  defined $valve ) && ( defined $setpoint )) {
+            $temp |= !!($setpoint & 0x80) << 8;
+            $setpoint &= 0x7F;
+            $device->_set(
+                mode        => $flags & 0x0003,
+                setpoint    => $setpoint / 2,
+                temperature => $temp / 10,
+                valve       => $valve,
+            );
+        } else {
+            $device->_set(
+                mode        => $flags & 0x0003,
+            );
+        }
     }
 }
 
