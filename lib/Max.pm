@@ -122,9 +122,6 @@ sub _process_L {
         my ($addr, undef, $flags, $valve, $setpoint, $date, $time, $temp)
             = unpack "a3 C n C C n C C", $devicedata;
 
-        $temp |= !!($setpoint & 0x80) << 8;
-        $setpoint &= 0x7F;
-
         my $device = $self->{devices}{$addr}
             or warn "Unexpected device " . unpack("H*", $addr);
 
@@ -136,12 +133,17 @@ sub _process_L {
             invalid       => !  ($flags & 0x1000),
         });
 
-        $device->_set(
-            mode        => $flags & 0x0003,
-            setpoint    => $setpoint / 2,
-            temperature => $temp / 10,
-            valve       => $valve,
-        ) if defined $setpoint;  # not for button/shutter
+        if (defined $setpoint) {  # not for button/shutter
+            $temp |= !!($setpoint & 0x80) << 8;
+            $setpoint &= 0x7F;
+
+            $device->_set(
+                mode        => $flags & 0x0003,
+                setpoint    => $setpoint / 2,
+                temperature => $temp / 10,
+                valve       => $valve,
+            );
+        }
     }
 }
 
