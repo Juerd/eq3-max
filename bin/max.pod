@@ -23,6 +23,22 @@ in the C<README.md> file of this distribution.
 
 When no subcommand is given, C<summary> is used.
 
+=head3 config <device_id|room_id|type|C<all>> display <setting>
+
+Configures which temperature the thermostat should display: either the
+C<setpoint> or the C<current>.
+
+=head3 config <device_id|room_id|type|C<all>> temperatures <comfort> <eco> <max> <min>
+
+C<temperatures> may be abbreviated as C<temp>.
+
+Configures the comfort ("day") and eco ("night") presets, and the limits for
+the on-device temperature control.
+
+To keep the current value for any of these temperatures, provide C<0> or C<''>.
+When fewer than 4 numbers are given, the remaining ones default to keeping the
+current value.
+
 =head3 crosslink <room_id>
 
 For each of the devices in a room, commands the device to link with each of the
@@ -36,7 +52,7 @@ Outputs a debug dump of the internal state after conncting
 
 Initiates the pairing of a new device and configures the device's room id.
 
-=head3 set <room_id> <temperature>
+=head3 set <room_id|C<all>> <temperature>
 
 Sends a new temperature to the devices in a room, forcing the mode to I<manual>.
 Specify C<all> instead of a numeric room ID to set the temperature everywhere.
@@ -55,7 +71,7 @@ argument.
 
 C<on> defaults to C<1>, C<off> defaults to C<0>.
 
-=head3 name <room|device> <name>
+=head3 name <room_id|device_id> <name>
 
 Sets the name for a room (numeric id) or device (6 digit hexadecimal id) and
 writes the metadata back to the Cube.

@@ -63,6 +63,12 @@ Configures the device to display either the current temperature, or the
 setpoint temperature. Will work on wall thermostats, or emit a warning
 otherwise.
 
+=head3 config_temperatures($comfort, $eco, $max, $min)
+
+Configures the device temperature presets and on-device setpoint limits. To
+keep any of the values unchanged, provide it as C<undef>. Will work on heaters
+and wall thermostats, or emit a warning otherwise.
+
 =head3 display_name($include_addr)
 
 Returns the configured name, or a string comprised of the device's type and
