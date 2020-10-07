@@ -238,6 +238,12 @@ sub do_config {
         }
         return;
     }
+    elsif ($param eq 'debug') {
+        for my $device (@devices) {
+            printf "%s: %s\n", $device->addr_hex, unpack "H*", $device->{config};
+        }
+        return;
+    }
     die "Unknown parameter: $param";
 }
 
