@@ -223,6 +223,21 @@ sub do_config {
         }
         return;
     }
+    elsif ($param eq 'temperatures' or $param eq 'temp') {
+        @_ < 0 and die "Not enough values";
+        @_ > 4 and die "Too many values";
+        defined and not $_ and $_ = undef for @_;  # Turn 0 or "" into undef.
+        defined and _valid_temperature($_) || die "Invalid temperature: $_" for @_;
+
+        my ($comfort, $eco, $max, $min) = @_;
+
+        for my $device (@devices) {
+            printf "Configuring %s...", $device->display_name_room;
+            print $device->config_temperatures($comfort, $eco, $max, $min)
+                ? " OK\n" : " FAILED\n";
+        }
+        return;
+    }
     die "Unknown parameter: $param";
 }
 

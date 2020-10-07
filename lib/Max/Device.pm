@@ -102,4 +102,23 @@ sub config_display {
     return $self->_send_radio(0x82, $hexdata);
 }
 
+sub config_temperatures {
+    my ($self, $comfort, $eco, $max, $min) = @_;
+
+    if (not $self->has_setpoint) {
+        carp "config_temperatures not supported for " . $self->type;
+        return;
+    }
+
+    # Only first 4 bytes are same for all setpoint-having devices!
+    substr $self->{config}, 0, 1, pack("C", $comfort * 2) if defined $comfort;
+    substr $self->{config}, 1, 1, pack("C", $eco     * 2) if defined $eco;
+    substr $self->{config}, 2, 1, pack("C", $max     * 2) if defined $max;
+    substr $self->{config}, 3, 1, pack("C", $min     * 2) if defined $min;
+
+    return $self->_send_radio(
+        0x11,
+        unpack("H*", substr($self->{config}, 0, $self->{type} eq 'thermostat' ? 4 : 7))
+    );
+}
 1;

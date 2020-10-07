@@ -88,8 +88,8 @@ sub _process_C {
     my ($self, $data) = @_;
     my ($addr_hex, $base64) = $data =~ /([^,]+),(.*)/;
 
-    my ($length, $addr2, $type, $room, $fw, $test, $serial)
-        = unpack("C a3 C C C C a10", decode_base64 $base64);
+    my ($length, $addr2, $type, $room, $fw, $test, $serial, $config)
+        = unpack("C a3 C C C C a10 a*", decode_base64 $base64);
 
     my $addr2_hex = unpack "H*", $addr2;
     warn "Address mismatch in 'C' response ($addr_hex != $addr2_hex)\n"
@@ -102,6 +102,7 @@ sub _process_C {
         firmware    => sprintf("%.1f", $fw/10),  # guessed
         test_result => $test,
         serial      => $serial,
+        config      => $config,
     );
 
     $self->{devices}{$addr2} = $device;
