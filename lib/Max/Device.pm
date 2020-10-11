@@ -39,6 +39,9 @@ sub type     { $types{shift->{type}} }
 sub mode_num {        shift->{mode}  }
 sub mode     { $modes{shift->{mode}} }
 
+sub comfort  { .5 * unpack "Cxxx", shift->{config} }
+sub eco      { .5 * unpack "xCxx", shift->{config} }
+
 sub name {
     my ($self, $new) = @_;
     return $self->{name} if not defined $new;

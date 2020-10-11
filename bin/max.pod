@@ -52,7 +52,7 @@ Outputs a debug dump of the internal state after conncting
 
 Initiates the pairing of a new device and configures the device's room id.
 
-=head3 set <room_id|C<all>> <temperature>
+=head3 set <room_id|C<all>> <temperature|eco|comfort>
 
 Sends a new temperature to the devices in a room, forcing the mode to I<manual>.
 Specify C<all> instead of a numeric room ID to set the temperature everywhere.

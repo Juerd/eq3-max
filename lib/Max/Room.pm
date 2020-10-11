@@ -3,6 +3,7 @@ use strict;
 package Max::Room;
 use Carp qw(croak carp);
 use MIME::Base64 qw(decode_base64 encode_base64);
+use List::Util ();
 
 sub new {
     my ($class, %p) = @_;
@@ -67,6 +68,18 @@ sub _get_setpoint {
         return $device->setpoint if $device->has_setpoint and $device->setpoint > 0;
     }
     return undef;
+}
+
+sub get_preset {
+    my ($self, $preset) = @_;
+    # TODO: validate $preset
+
+    my @devices = grep $_->has_setpoint, $self->devices;
+    my @thermostats = grep $_->has_temperature, @devices;
+    return $thermostats[0]->$preset if @thermostats;
+    return $devices[0]->$preset if @devices;
+    return 17 if $preset eq 'eco';
+    return 21 if $preset eq 'comfort';
 }
 
 sub setpoint {
