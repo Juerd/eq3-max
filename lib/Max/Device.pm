@@ -119,7 +119,7 @@ sub config_temperatures {
     substr $self->{config}, 2, 1, pack("C", $max     * 2) if defined $max;
     substr $self->{config}, 3, 1, pack("C", $min     * 2) if defined $min;
 
-    my $config_data = $self->{type} eq 'thermostat'
+    my $config_data = $self->type eq 'thermostat'
         ? substr($self->{config}, 0, 4) . substr($self->{config}, 186, 2)
         # at offset 186: offset, window-open; duration not in {config}?
         : substr($self->{config}, 0, 7);
