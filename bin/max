@@ -11,6 +11,7 @@ use Max;
 
 my $host = $ENV{MAX_HOST};
 my $max;
+my $clear = 0;  # bool
 
 sub _valid_uint8 {
     my ($id) = @_;
@@ -30,6 +31,10 @@ sub _valid_temperature {
     $t >= 0 or return 0;  # limit?
     $t < 60 or return 0;  # limit?
     return 1;
+}
+
+sub clear {
+    system 'clear' if $clear;
 }
 
 sub do_pair {
@@ -116,6 +121,7 @@ sub do_set {
 
 sub do_status {
     $max ||= Max->connect($host);
+    clear;
 
     my $width = max(map { length $_->display_name(1) } $max->devices);
 
@@ -151,6 +157,7 @@ sub do_status {
 
 sub do_summary {
     $max ||= Max->connect($host);
+    clear;
 
     my $width = max(map { length $_->display_name(1) } $max->rooms);
 
@@ -196,6 +203,7 @@ sub do_switch {
     $off //= 0;
 
     $max ||= Max->connect($host);
+    clear;
     my $switch = $max->heat_demand;
 
     $command = sprintf $command, $switch ? $on : $off;
@@ -283,7 +291,6 @@ $| = 1;
 
 
 my $loop = -1;
-my $clear = 0;
 if (@ARGV and $ARGV[0] =~ /^(loop|watch)$/) {
     $clear = 1 if $1 eq 'watch';
     shift;
@@ -309,13 +316,13 @@ while (@ARGV) {
         shift;
         redo;
     } else {
-        system 'clear' if $clear;
         $sub->(@ARGV);
         @ARGV = ();
     }
     if ($loop >= 0) {
         @ARGV = @orig_ARGV;
-        undef $max if $loop;  # disconnect because cube doesn't do concurrency
+        $max->disconnect;
+        undef $max;  # disconnect because cube doesn't do concurrency
         sleep $loop;
         print "\n" if not $clear;
     }
