@@ -1,3 +1,5 @@
+<img alt="Screencast of setting temperatures" src="screencast.svg">
+
 # Yet another
 
 In general, reinventing the wheel seems like a waste of time. But I decided to
