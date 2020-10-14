@@ -11,14 +11,8 @@ original software, I needed something that will even work if you begin with a
 new, unconfigured Cube.
 
 Of course, my program is incomplete too. It does exactly what I need, but not
-much more.
-
-# Reference documentation
-
-- [executable `max`](bin/max.pod)
-- [Perl class `Max`](lib/Max.pod)
-- [Perl class `Max::Device`](lib/Max/Device.pod)
-- [Perl class `Max::Room`](lib/Max/Room.pod)
+much more. Note that it can work with readonly filesystems because the
+configuration is taken from and written to the eQ-3 Max! system itself.
 
 # Features
 
@@ -48,6 +42,13 @@ Contrib scripts included:
   switch a boiler via a relay.
 * _welterusten_ (Dutch for "good night!") is an example of scheduling with
   `at`, as an alternative to fixed time schedules.
+
+# Reference documentation
+
+- [executable `max`](bin/max.pod)
+- [Perl class `Max`](lib/Max.pod)
+- [Perl class `Max::Device`](lib/Max/Device.pod)
+- [Perl class `Max::Room`](lib/Max/Room.pod)
 
 # Installing
 
