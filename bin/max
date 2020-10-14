@@ -1,7 +1,11 @@
 #!/usr/bin/perl -w
 use strict;
+use utf8;
+use open qw(:std :encoding(UTF-8));
+
 use List::Util qw(sum max first);
 use FindBin qw($RealBin);
+
 use lib "$RealBin/../lib";
 use Max;
 
@@ -157,10 +161,29 @@ sub do_summary {
         my @valves = map sprintf("%3d%%", $_->valve),
             grep $_->has_valve, @devices;
 
-        printf "* %-${width}s %4.1f -> %4.1f %s\n",
+        my $t = $room->temperature // 0;
+        my $s = $room->setpoint // 0;
+
+	my $color1 = !-t STDOUT ? ""
+                   : $t > $s && abs($t - $s) > .2 ? "\e[31m"
+                   : $t < $s && abs($t - $s) > .2 ? "\e[34m" : "";
+
+        my $color2 = !-t STDOUT ? ""
+                   : $t > $s ? "\e[34m"
+                   : $t < $s ? "\e[31m" : "";
+
+	my $endcolor = !-t STDOUT ? "" : "\e[0m";
+
+        printf "* %-${width}s %s%4.1f%s %s→ %4.1f %1s%s %s\n",
             $room->display_name(1),
-            $room->temperature // 0,
-            $room->setpoint // 0,
+            $color1,
+            $t,
+            $endcolor,
+            $color2,
+            $s,
+            ( $s == $room->get_preset("comfort") ? "☀"
+            : $s == $room->get_preset("eco")     ? "☾" : ""),
+            $endcolor,
             "@valves";
     }
 }
