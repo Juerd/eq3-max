@@ -1,0 +1,14 @@
+[Unit]
+Description=eq3-max ketelbesturing
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Environment="MAX_HOST=192.168.0.104"
+ExecStart=/root/eq3-max/bin/max loop summary \; switch /root/eq3-max/contrib/set-gpio
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
