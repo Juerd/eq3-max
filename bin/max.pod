@@ -11,17 +11,32 @@ max - Simple shell interface for the eQ-3 MAX! Cube LAN Gateway
     max set 42 18.0
     max dump
 
-    max switch '/usr/local/bin/set-gpio'
-    max switch '/usr/local/bin/%s-my-boiler' enable disable
+    max loop switch '/usr/local/bin/set-gpio'
+    max loop switch '/usr/local/bin/%s-my-boiler' enable disable
+
+    max watch
 
 =head1 DESCRIPTION
 
 For instructions and examples, please refer to the main documentation
 in the C<README.md> file of this distribution.
 
+Usage: C<< max [<loop|watch> [<interval>]] [<subcommand> <args> \; <subcommand> <args> \; ...)
+
+=head2 Modifiers
+
+When the first argument is C<loop> or C<watch>, the subcommands are repeated every I<interval> seconds. If no interval is specified, it will default to 10 seconds.
+
+C<loop> will add an empty line between the outputs, C<watch> will clear the screen before each subcommand.
+
 =head2 Subcommands
 
 When no subcommand is given, C<summary> is used.
+
+Multiple subcommands can be specified by separating them by a C<;>. Note that
+the C<;> will probably need escaping or quoting (e.g. C<\;> or C<';'>) and must
+be an argument by itself, i.e. separated by whitespace on the shell command
+line.
 
 =head3 config <device_id|room_id|type|C<all>> display <setting>
 

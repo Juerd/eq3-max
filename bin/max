@@ -281,7 +281,18 @@ sub do_reboot {
 
 $| = 1;
 
+
+my $loop = -1;
+my $clear = 0;
+if (@ARGV and $ARGV[0] =~ /^(loop|watch)$/) {
+    $clear = 1 if $1 eq 'watch';
+    shift;
+    $loop = (@ARGV and $ARGV[0] =~ /^\d+$/) ? shift : 10;
+}
+
 @ARGV = ('summary') if not @ARGV;
+
+my @orig_ARGV = @ARGV;
 
 while (@ARGV) {
     my $command = shift;
@@ -296,9 +307,17 @@ while (@ARGV) {
     if (defined $i) {
         $sub->(splice @ARGV, 0, $i);
         shift;
+        redo;
     } else {
+        system 'clear' if $clear;
         $sub->(@ARGV);
-        exit;
+        @ARGV = ();
+    }
+    if ($loop >= 0) {
+        @ARGV = @orig_ARGV;
+        sleep $loop;
+        print "\n" if not $clear;
     }
 }
+
 
