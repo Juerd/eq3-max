@@ -140,7 +140,7 @@ room:
 8. Use 'watch' to get a live refreshing overview:
 
   ```
-    watch max
+    max watch
 ```
 
 Optionally, configure names for your rooms and devices:
