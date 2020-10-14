@@ -315,6 +315,7 @@ while (@ARGV) {
     }
     if ($loop >= 0) {
         @ARGV = @orig_ARGV;
+        undef $max if $loop;  # disconnect because cube doesn't do concurrency
         sleep $loop;
         print "\n" if not $clear;
     }
