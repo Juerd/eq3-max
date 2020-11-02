@@ -74,7 +74,20 @@ Specify C<all> instead of a numeric room ID to set the temperature everywhere.
 
 =head3 summary
 
+Outputs a list of rooms with values from the room's devices.
+
+=head3 status
+
 Outputs a summary of device attributes, grouped by room.
+
+=head3 mqtt <hostname> <topic_prefix>
+
+Publishes device attributes to the given MQTT server. Currently does not
+support any authentication or TLS. The I<topic_prefix> should not end in C</>,
+as one is added by the program.
+
+The messages are sent with the I<retain> flag enabled, and consist of the
+numeric decimal value, a space, and the corresponding unit.
 
 =head3 switch <command> [<on> <off>]
 
