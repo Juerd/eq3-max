@@ -84,11 +84,14 @@ Outputs a list of rooms with values from the room's devices.
 
 Outputs a summary of device attributes, grouped by room.
 
-=head3 mqtt <hostname> <topic_prefix>
+=head3 mqtt <hostname> <topic_prefix> <username> <password>
 
 Publishes device attributes to the given MQTT server. Currently does not
-support any authentication or TLS. The I<topic_prefix> should not end in C</>,
-as one is added by the program.
+support TLS. The I<topic_prefix> should not end in C</>, as one is added by the
+program.
+
+Username and password are optional. If they are specified, you probably also
+want to add the C<MQTT_SIMPLE_ALLOW_INSECURE_LOGIN=1> environment variable.
 
 The messages are sent with the I<retain> flag enabled, and consist of the
 numeric decimal value, a space, and the corresponding unit.
