@@ -294,7 +294,10 @@ sub do_mqtt {
     require Net::MQTT::Simple;
     my $hostname = shift;
     my $topic_prefix = shift;
+    my $username = shift;
+    my $password = shift;
     our $mqtt ||= Net::MQTT::Simple->new($hostname);
+    $mqtt->login($username, $password) if $username and $password;
 
     for my $room ($max->rooms) {
         my @devices = $room->devices;
@@ -303,16 +306,25 @@ sub do_mqtt {
         for my $device (@devices) {
             my $r = $room->display_name;
             my $d = $device->display_name;
-            s/\ /-/g for $r, $d;
+            s/\W+/-/g for $r, $d;
             my $devtopic = join "/", $topic_prefix, $r, $d;
             my $c = "°C";
             utf8::encode($c);
             $mqtt->retain("$devtopic/valve", $device->valve . " %")
                 if $device->has_valve;
+            $mqtt->retain("$devtopic/valve_perc", $device->valve)
+                if $device->has_valve;
             $mqtt->retain("$devtopic/setpoint", $device->setpoint . " $c")
+                if $device->has_setpoint;
+            $mqtt->retain("$devtopic/setpoint_c", $device->setpoint)
                 if $device->has_setpoint;
             $mqtt->retain("$devtopic/temperature", $device->temperature . " $c")
                 if $device->has_temperature;
+            $mqtt->retain("$devtopic/temperature_c", $device->temperature)
+                if $device->has_temperature;
+            while( my ($flag, $value) = each %{$device->{flags}} ) {
+                $mqtt->retain("$devtopic/flag_$flag", $value ? 1 : 0);
+            }
         }
     }
 }
