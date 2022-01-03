@@ -138,6 +138,8 @@ sub _process_L {
             $temp |= !!($setpoint & 0x80) << 8;
             $setpoint &= 0x7F;
 
+            $temp = $date if $temp == 0 and $date > 0 and $device->has_temperature;
+
             $device->_set(
                 mode        => $flags & 0x0003,
                 setpoint    => $setpoint / 2,
