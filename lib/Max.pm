@@ -126,26 +126,28 @@ sub _process_L {
         my $device = $self->{devices}{$addr}
             or warn "Unexpected device " . unpack("H*", $addr);
 
-        $device->_set(flags => {
-            link_error    => !! ($flags & 0x0040),
-            battery       => !! ($flags & 0x0080),
-            uninitialized => !  ($flags & 0x0200),
-            error         => !! ($flags & 0x0800),
-            invalid       => !  ($flags & 0x1000),
-        });
+        if (defined $device) {
+            $device->_set(flags => {
+                link_error    => !! ($flags & 0x0040),
+                battery       => !! ($flags & 0x0080),
+                uninitialized => !  ($flags & 0x0200),
+                error         => !! ($flags & 0x0800),
+                invalid       => !  ($flags & 0x1000),
+            });
 
-        if (defined $setpoint) {  # not for button/shutter
-            $temp |= !!($setpoint & 0x80) << 8;
-            $setpoint &= 0x7F;
+            if (defined $setpoint) {  # not for button/shutter
+                $temp |= !!($setpoint & 0x80) << 8;
+                $setpoint &= 0x7F;
 
-            $temp = $date if $temp == 0 and $date > 0 and $device->has_temperature;
+                $temp = $date if $temp == 0 and $date > 0 and $device->has_temperature;
 
-            $device->_set(
-                mode        => $flags & 0x0003,
-                setpoint    => $setpoint / 2,
-                temperature => $temp / 10,
-                valve       => $valve,
-            );
+                $device->_set(
+                    mode        => $flags & 0x0003,
+                    setpoint    => $setpoint / 2,
+                    temperature => $temp / 10,
+                    valve       => $valve,
+                );
+            }
         }
     }
 }
