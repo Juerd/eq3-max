@@ -119,6 +119,23 @@ sub do_set {
     print "Done.\n";
 }
 
+sub do_boost {
+    my ($room_id) = @_;
+    $room_id ||= 0;
+
+    my $usage = "Usage: $0 boost <roomid>\n";
+    $room_id eq 'all' or _valid_uint8($room_id) && $room_id > 0 or die $usage;
+
+    $max ||= Max->connect($host);
+
+    for my $room ($room_id eq 'all' ? $max->rooms : $max->room($room_id)) {
+        $room->devices or warn "No devices in " . $room->display_name . ".\n";
+        printf "Boosting %s.\n", $room->display_name;
+        $room->boost() or die "Boosting temperature failed.\n";
+    }
+    print "Done.\n";
+}
+
 sub do_status {
     $max ||= Max->connect($host);
     clear;

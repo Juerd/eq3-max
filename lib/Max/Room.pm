@@ -94,6 +94,12 @@ sub setpoint {
     return $self->_send_radio(0x40, sprintf "%02x", $t2 | 0x40);
 }
 
+sub boost {
+    my ($self) = @_;
+    my $t2 = $self->_get_setpoint * 2;
+    return $self->_send_radio(0x40, sprintf "%02x", $t2 | 0xc0);   
+}
+
 sub too_cold {
     my ($self, $maxdelta) = @_;
     $maxdelta ||= 0;
