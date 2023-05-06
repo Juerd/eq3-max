@@ -102,10 +102,10 @@ sub do_set {
     my ($room_id, $setpoint) = @_;
     $room_id ||= 0;
 
-    my $usage = "Usage: $0 set <roomid> <eco|comfort|temperature per 0.5>\n";
+    my $usage = "Usage: $0 set <roomid> <boost|eco|comfort|temperature per 0.5>\n";
     $room_id eq 'all' or _valid_uint8($room_id) && $room_id > 0 or die $usage;
 
-    $setpoint eq 'eco' or $setpoint eq 'comfort'
+    $setpoint eq 'eco' or $setpoint eq 'comfort' or $setpoint eq 'boost'
         or _valid_temperature($setpoint) or die $usage;
 
     $max ||= Max->connect($host);
@@ -114,7 +114,11 @@ sub do_set {
         $room->devices or warn "No devices in " . $room->display_name . ".\n";
         my $t = $setpoint =~ /eco|comfort/ ? $room->get_preset($setpoint) : $setpoint;
         printf "Setting %s temperature to %s.\n", $room->display_name, $t;
-        $room->setpoint($t) or die "Setting temperature failed.\n";
+        if($setpoint eq 'boost'){
+           $room->boost() or die "Boosting temperature failed.\n";
+        }else{
+           $room->setpoint($t) or die "Setting temperature failed.\n";
+        }
     }
     print "Done.\n";
 }
